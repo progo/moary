@@ -4,6 +4,7 @@ about it."""
 import re
 import subprocess
 import os
+import time
 
 from entry import Entry
 
@@ -101,5 +102,10 @@ def edit_data_interactive(data):
         data.imdb = ask_imdb_interactive(data.movie)
     else:
         data.imdb = clean_id
+
+    # update or create timestamps
+    data.update = time.ctime()
+    if not data.origdate:
+        data.origdate = data.update
  
     return data
