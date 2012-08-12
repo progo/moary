@@ -2,6 +2,7 @@
 about it."""
 
 import re
+import subprocess
 import os
 
 def parse_file(f):
@@ -39,7 +40,10 @@ def clean_imdb_id(s):
 
 def ask_imdb_interactive(moviename):
     """run query to IMDB and ask user the movie id. Return the id."""
-    import imdb
+    try:
+        import imdb
+    except ImportError:
+        return ""
     ia = imdb.IMDb()
     ITEMS = 7
     run = ia.search_movie(moviename, results=ITEMS)
@@ -74,14 +78,13 @@ def fill_in_form(data):
 def edit_data_interactive(data):
     """given the movie dict, invoke editor on user to edit the entry. Return
     the dict with possibly updated info."""
-    from subprocess import call
     import tempfile
     EDITOR = os.environ['EDITOR'] or "ed"
 
     with tempfile.NamedTemporaryFile() as tempfile:
         tempfile.write(fill_in_form(data))
         tempfile.flush()
-        call([EDITOR, tempfile.name])
+        subprocess.call([EDITOR, tempfile.name])
         data = parse_file(tempfile)
 
         if not data["movie"]:
