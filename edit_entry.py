@@ -9,7 +9,7 @@ import time
 from entry import Entry
 
 def parse_file(f):
-    """read the temp file containing rate and other stuff. Return an Entry.""" 
+    """read the temp file containing rate and other stuff. Return an Entry."""
 
     def clean_line(s):
         """remove initial label from the beginning of the line"""
@@ -18,11 +18,11 @@ def parse_file(f):
     f.seek(0)
 
     # now just go through the file format
-    data = Entry(movie=clean_line(f.readline()))
+    data = Entry(movie=unicode(clean_line(f.readline())))
     data.rating = clean_line(f.readline())
     data.imdb = clean_line(f.readline())
     f.readline()
-    data.message = f.read().strip()
+    data.message = unicode(f.read().strip())
     return data
 
 def clean_imdb_id(s):
