@@ -13,7 +13,7 @@ CREATE = """CREATE TABLE IF NOT EXISTS movies
              updated text);"""
 
 DBFILE = "movies.db"
-DATADIR = "data"
+DATADIR = "."
 
 def establish_connection():
     dbfileloc = os.path.join(sys.path[0], DATADIR, DBFILE)

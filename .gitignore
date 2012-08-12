@@ -1,3 +1,3 @@
 *.swp
 *.pyc
-data/
+movies.db
