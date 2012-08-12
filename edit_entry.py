@@ -55,8 +55,12 @@ def ask_imdb_interactive(moviename):
         counter += 1
     while True:
         try:
-            number = int(raw_input(
-                "Which of these titles you had in mind? [0 to skip] "))
+            user_input = raw_input(
+                "Which of these titles you had in mind? [0 to skip] ")
+            if user_input == '': #default
+                number = 1
+            else:
+                number = int(user_input)
             if number == 0: return ""
             if number < 0 or number > ITEMS: raise ValueError()
             return ids[number - 1]
