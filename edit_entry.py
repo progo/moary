@@ -5,23 +5,24 @@ import re
 import subprocess
 import os
 
+from entry import Entry
+
 def parse_file(f):
-    """read the temp file containing rate and other stuff. Return a dict with
-    the data."""
+    """read the temp file containing rate and other stuff. Return an Entry.""" 
 
     def clean_line(s):
         """remove initial label from the beginning of the line"""
         return re.sub(r"\A.*?: ?", "", s.strip()).strip()
 
     f.seek(0)
-    parsed = {}
+
     # now just go through the file format
-    parsed["movie"] = clean_line(f.readline())
-    parsed["rating"] = clean_line(f.readline())
-    parsed["imdb"] = clean_line(f.readline())
+    data = Entry(movie=clean_line(f.readline()))
+    data.rating = clean_line(f.readline())
+    data.imdb = clean_line(f.readline())
     f.readline()
-    parsed["message"] = f.read().strip()
-    return parsed
+    data.message = f.read().strip()
+    return data
 
 def clean_imdb_id(s):
     """Clean IMDB identifiers. Return all-numeric presentation (as string).
@@ -70,18 +71,19 @@ def ask_imdb_interactive(moviename):
 def fill_in_form(data):
     """given movie dict, return filled-out form string for editors."""
     initial_message = (
-        "Movie: {movie}\n" +
-        "Rating: {rating}\n" +
-        "IMDB: {imdb}\n" +
+        "Movie: {0}\n" +
+        "Rating: {1}\n" +
+        "IMDB: {2}\n" +
         "----- Review -----\n" +
-        "{message}")
+        "{3}")
     if not data:
-        data = {"movie": "", "rating": "", "imdb": "", "message": ""}
-    return initial_message.format(**data)
+        return initial_message.format('','','','\n')
+    return initial_message.format(data.movie, data.rating, data.imdb,
+            data.message)
 
 def edit_data_interactive(data):
-    """given the movie dict, invoke editor on user to edit the entry. Return
-    the dict with possibly updated info."""
+    """given the Entry, invoke editor on user to edit the entry. Return the
+    Entry with possibly updated info."""
     import tempfile
     EDITOR = os.environ['EDITOR'] or "ed"
 
@@ -91,13 +93,13 @@ def edit_data_interactive(data):
         subprocess.call([EDITOR, tempfile.name])
         data = parse_file(tempfile)
 
-        if not data["movie"]:
+        if not data.movie:
             print "No movie name provided."
 
-    clean_id = clean_imdb_id(data["imdb"])
+    clean_id = clean_imdb_id(data.imdb)
     if not clean_id:
-        data["imdb"] = ask_imdb_interactive(data["movie"])
+        data.imdb = ask_imdb_interactive(data.movie)
     else:
-        data["imdb"] = clean_id
+        data.imdb = clean_id
  
     return data
