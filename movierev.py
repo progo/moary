@@ -2,21 +2,12 @@
 import sys, tempfile, re
 from subprocess import call
 
-import os
-EDITOR = os.environ['EDITOR']
-
-initial_message = """Movie: 
-Rating: 
-IMDB: 
------ Review -----
-
-"""
-
-def clean_line(s):
-    """remove initial label from the beginning of the line"""
-    return re.sub(r"\A.*?: ?", "", s.strip()).strip()
 
 def parse_file(f):
+    def clean_line(s):
+        """remove initial label from the beginning of the line"""
+        return re.sub(r"\A.*?: ?", "", s.strip()).strip()
+
     """read the temp file containing rate and other stuff. Return a dict with
     the data."""
     f.seek(0)
@@ -67,6 +58,15 @@ def ask_imdb(moviename):
             print "Sorry, not understood..."
 
 if __name__ == '__main__':
+    import os
+    EDITOR = os.environ['EDITOR']
+
+    initial_message = """Movie: 
+Rating: 
+IMDB: 
+----- Review -----
+
+"""
     with tempfile.NamedTemporaryFile() as tempfile:
         tempfile.write(initial_message)
         tempfile.flush()
