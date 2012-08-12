@@ -5,10 +5,10 @@ from subprocess import call
 import os
 EDITOR = os.environ['EDITOR']
 
-initial_message = """Elokuva: 
-Arvosana: 
+initial_message = """Movie: 
+Rating: 
 IMDB: 
------ Arvio -----
+----- Review -----
 
 """
 
