@@ -103,9 +103,7 @@ def edit_data_interactive(data):
     else:
         data.imdb = clean_id
 
-    # update or create timestamps
+    # update timestamps
     data.update = time.ctime()
-    if not data.origdate:
-        data.origdate = data.update
  
     return data
