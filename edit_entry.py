@@ -86,7 +86,7 @@ def fill_in_form(data):
     return initial_message.format(data.movie, data.rating, data.imdb,
             data.message)
 
-def edit_data_interactive(data):
+def edit_data_interactive(data, skip_imdb=False):
     """given the Entry, invoke editor on user to edit the entry. Return the
     Entry with possibly updated info."""
     import tempfile
@@ -103,7 +103,7 @@ def edit_data_interactive(data):
 
     clean_id = clean_imdb_id(data.imdb)
     if not clean_id:
-        data.imdb = ask_imdb_interactive(data.movie)
+        data.imdb = '' if skip_imdb else ask_imdb_interactive(data.movie)
     else:
         data.imdb = clean_id
 
