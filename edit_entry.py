@@ -8,6 +8,10 @@ import time
 
 from entry import Entry
 
+class UserCancel():
+    """Exception when user decides to cancel the interactive scenes."""
+    pass
+
 def parse_file(f):
     """read the temp file containing rate and other stuff. Return an Entry."""
 
@@ -95,7 +99,7 @@ def edit_data_interactive(data):
         data = parse_file(tempfile)
 
         if not data.movie:
-            print "No movie name provided."
+            raise UserCancel()
 
     clean_id = clean_imdb_id(data.imdb)
     if not clean_id:
