@@ -3,8 +3,10 @@
 import argparse
 
 import edit_entry
-from entry import Entry
+import imdbutils
 import data
+
+from entry import Entry
 
 
 def do_add(args):
@@ -20,7 +22,7 @@ def do_add(args):
         newflick = Entry(unicode(args.movie), args.rating,
                 args.imdb, unicode(args.message))
         if not args.skip_imdb:
-            newflick = edit_entry.ensure_good_imdb_id(newflick)
+            newflick = imdbutils.ensure_good_imdb_id(newflick)
     if args.debug:
         print newflick.__dict__
     else:
