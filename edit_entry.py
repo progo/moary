@@ -73,6 +73,16 @@ def ask_imdb_interactive(moviename):
         except ValueError:
             print "Sorry, not understood..."
 
+def ensure_good_imdb_id(entry):
+    """Cleans the entry's imdb id. If it is not up to task, ask interactively
+    better one. Return entry with updated info."""
+    clean_id = clean_imdb_id(entry.imdb)
+    if not clean_id:
+        entry.imdb = ask_imdb_interactive(entry.movie)
+    else:
+        entry.imdb = clean_id
+    return entry
+
 def fill_in_form(data):
     """given movie dict, return filled-out form string for editors."""
     initial_message = (
@@ -98,14 +108,11 @@ def edit_data_interactive(data, skip_imdb=False):
         subprocess.call([EDITOR, tempfile.name])
         data = parse_file(tempfile)
 
-        if not data.movie:
-            raise UserCancel()
+    if not data.movie:
+        raise UserCancel()
 
-    clean_id = clean_imdb_id(data.imdb)
-    if not clean_id:
-        data.imdb = '' if skip_imdb else ask_imdb_interactive(data.movie)
-    else:
-        data.imdb = clean_id
+    if not skip_imdb:
+        data = ensure_good_imdb_id(data)
 
     # update timestamps
     data.update = time.ctime()

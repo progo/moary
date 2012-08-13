@@ -19,13 +19,8 @@ def do_add(args):
     else:
         newflick = Entry(unicode(args.movie), args.rating,
                 args.imdb, unicode(args.message))
-        # TODO, warning: WET code
-        clean_id = edit_entry.clean_imdb_id(newflick.imdb)
-        if not clean_id:
-            newflick.imdb = '' if args.skip_imdb \
-                else edit_entry.ask_imdb_interactive(newflick.movie)
-        else:
-            newflick.imdb = clean_id
+        if not args.skip_imdb:
+            newflick = edit_entry.ensure_good_imdb_id(newflick)
     if args.debug:
         print newflick.__dict__
     else:
