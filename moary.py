@@ -26,7 +26,10 @@ def do_add(args):
                 else edit_entry.ask_imdb_interactive(newflick.movie)
         else:
             newflick.imdb = clean_id
-    data.store_entry(newflick)
+    if args.debug:
+        print newflick.__dict__
+    else:
+        data.store_entry(newflick)
 
 def do_list(args):
     """CLI func to call when doing subtask "list". """
@@ -41,6 +44,8 @@ def _create_and_parse_args():
 
     psr.add_argument('-I', '--skip-imdb', action='store_true',
             help="Don't query IMDB")
+    psr.add_argument('-D', '--debug', action='store_true',
+            help="Debug and dry-run.")
 
     addparser = subparser.add_parser('add',
             help="Add new entry")
