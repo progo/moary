@@ -1,32 +1,72 @@
 Moary
 =====
 
-A work-in-progress effort to provide a local movie rating database for CLI. The
-workflow with the usable product follows:
+A work-in-progress effort to provide a local movie rating database or rather a
+diary for the CLI. The workflow with the usable product follows:
 
-interactive workflow
+Workflow examples
+-----------------
 
-    1. Watch the picture, gather your thoughts about it.
-    2. Run ``moary.py add``.
-    3. ``$EDITOR`` will open with a simple form. Fill as much as you'd like to.
-       Movie name is the only required field. Save and exit.
-    4. If you didn't enter IMDB id or URL, Moary queries IMDB with 7 closest
-       names and you choose the one you meant.
-    5. There it is now. Saved in database somewhere.
+Moary is designed with interactive editing in mind, but I value the power of
+batch-oriented inserts.
 
-enter from CLI
+Interactive workflow
+````````````````````
 
-    1. Watch the picture, gather your thoughts about it.
-    2. As an example::
+The usual way with longer messages is to have the interactive session with
+your favourite editor.
 
-        moary.py add "Mulholland Dr." -r 5 -m "Very nice movie."
+1. Watch the picture, gather your thoughts about it.
+2. Run ``moary.py add``.
+3. ``$EDITOR`` will open with a simple form. Fill as much as you'd like to.
+   Movie name is the only required field. Save and exit.
+4. If you didn't enter IMDB id or URL, Moary queries IMDB with 7 closest names
+   and you choose the one you meant. (Skip this phase using option ``-I``.)
+5. There it is now. Saved in database somewhere.
 
-    3. As you didn't enter IMDB url (with the optional ``-i`` flag), you get
-       the prompt asking about correct IMDB title.
-    4. Override query with the flag ``-I`` (don't query IMDB) or enter
-       correct(ish) IMDB id with ``-i``.
+Enter from CLI
+``````````````
+
+For those quick ones, or for applications of batch process capabilities,
+everything can be done with command-line arguments.
+
+1. Watch the picture, gather your thoughts about it.
+2. As an example::
+
+    moary.py add "Mulholland Dr." -r 5 -m "Very nice movie."
+
+3. As you didn't enter IMDB url (with the optional ``-i`` flag), you get the
+   prompt asking about correct IMDB title.
+4. Skip the query with the flag ``-I`` (don't query IMDB) or enter correct(ish)
+   IMDB id with ``-i``.
 
 A some sort of list or search capability will appear some time.
+
+Plain examples
+``````````````
+
+Get help::
+    
+    moary.py -h
+    moary.py add -h
+
+Full entry from command line (doesn't ask you IMDB titles because one is
+given)::
+
+    moary.py add "Mulholland Dr." -r 5 -m "ok movie" -i 0166924
+
+The same example with long options::
+
+    moary.py add "Mulholland Dr." --rating 5 --message "ok movie" --imdb 0166924
+
+The only required thing to add, is the name of the movie. Moary will ask about
+the IMDB title::
+
+    moary.py add "Lost Highway"
+
+Now it keeps quiet and no ID is set::
+
+    moary.py -I add "Lost Highway"
 
 Philosophy
 ----------
