@@ -32,6 +32,20 @@ def do_list(args):
     """CLI func to call when doing subtask "list". """
     print "listing!"
 
+def do_edit(args):
+    """Handle subtask "edit"."""
+    if args.delete:
+        if args.debug:
+            print "Would delete:", vars(data.get_last())
+        else:
+            data.delete_entry()
+            return
+    # at this point, only edit the last one
+    lastentry = data.get_last()
+    edited = edit_entry.edit_data_interactive(lastentry,
+            skip_imdb=args.skip_imdb)
+    data.set_entry(edited)
+
 def _create_and_parse_args():
     """Create the arg parser and do the magic."""
     psr = argparse.ArgumentParser(description="A movie diary.")
@@ -61,6 +75,13 @@ def _create_and_parse_args():
             help='List entries')
     listparser.set_defaults(func=do_list)
     # TODO: to be concluded
+
+    # edit section will be limited to the last one for the time being.
+    editparser = subparser.add_parser('edit',
+            help='Edit entries')
+    editparser.add_argument("-d", "--delete", action="store_true",
+            help='Delete last entry')
+    editparser.set_defaults(func=do_edit)
 
     args = psr.parse_args()
     return args
