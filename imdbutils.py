@@ -2,7 +2,7 @@
 
 def imdb_url(imdbid):
     """Return an URL to a movie's IMDB page."""
-    return "http://www.imdb.com/title/{0}/".format(imdbid)
+    return "http://www.imdb.com/title/tt{0}/".format(imdbid)
 
 def clean_imdb_id(s):
     """Clean IMDB identifiers. Return all-numeric presentation (as string).
