@@ -38,6 +38,14 @@ def get_last():
         cur.execute("SELECT * FROM movies ORDER BY rowid DESC LIMIT 1")
         return Entry(*cur.fetchone())
 
+def get_all_entries():
+    """return all entries from db."""
+    # TODO wasteful...
+    with establish_connection() as con:
+        cur = con.cursor()
+        cur.execute("SELECT * FROM movies")
+        return [Entry(*row) for row in cur.fetchall()]
+
 def __get_last_rowid(con):
     """get the last rowid. Uses an existing connection."""
     cur = con.cursor()

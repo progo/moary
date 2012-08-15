@@ -8,7 +8,6 @@ import data
 
 from entry import Entry
 
-
 def do_add(args):
     """CLI func to call when doing subtask "add". """
     if not args.movie:
@@ -30,7 +29,20 @@ def do_add(args):
 
 def do_list(args):
     """CLI func to call when doing subtask "list". """
-    print "listing!"
+    if args.format == 'compact':
+        formatstring = '{movie}, {rating}, as seen {origdate}'
+    elif args.format == 'full':
+        formatstring = (
+            '-------------------------------------------------------------\n'+
+            '{movie}\n'+
+            '{rating} points,     {origdate}\n'+
+            '{message}')
+    elif args.format == 'csv':
+        # TODO needs to escape ;s in content.
+        formatstring = '{movie};{rating};{origdate}'
+
+    for e in data.get_all_entries():
+        print formatstring.format(**vars(e))
 
 def do_edit(args):
     """Handle subtask "edit"."""
@@ -73,8 +85,18 @@ def _create_and_parse_args():
 
     listparser = subparser.add_parser('list',
             help='List entries')
-    listparser.set_defaults(func=do_list)
-    # TODO: to be concluded
+    listparser.add_argument("format", nargs='?',
+            help='Select the format style.',
+            choices=["compact", "csv", "full"])
+    listparser.add_argument('-t', '--title', action='store',
+            help='Grep titles.')
+    listparser.add_argument('-m', '--message', action='store',
+            help='Grep messages.')
+    listparser.add_argument('-b', '--better-than', type=int,
+            help='Show films with rating better or equal than')
+    listparser.add_argument('-w', '--worse-than', type=int,
+            help='Show films with rating worse or equal than')
+    listparser.set_defaults(format='compact', func=do_list)
 
     # edit section will be limited to the last one for the time being.
     editparser = subparser.add_parser('edit',
