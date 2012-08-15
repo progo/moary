@@ -4,6 +4,7 @@ import argparse
 
 import edit_entry
 import imdbutils
+import listings
 import data
 
 from entry import Entry
@@ -26,27 +27,6 @@ def do_add(args):
         print newflick.__dict__
     else:
         data.store_entry(newflick)
-
-def do_list(args):
-    """CLI func to call when doing subtask "list". """
-    if args.format == 'compact':
-        def fmtfunc(e):
-            return '{movie},   {rating},     ({origdate})'.format(**vars(e))
-    elif args.format == 'full':
-        def fmtfunc(e):
-            return ('---------------------------------------------------\n'+
-                '{movie}\n'+
-                '{rating} points,   {imdburl}     ({origdate})\n'+
-                '{message}').format(movie=e.movie, rating=e.rating,
-                        imdburl=imdbutils.imdb_url(e.imdb),
-                        origdate=e.origdate, message=e.message)
-    elif args.format == 'csv':
-        def fmtfunc(e):
-            # TODO needs to escape ;s in content.
-            return '{movie};{rating};{origdate}'.format(**vars(e))
-
-    for e in data.get_all_entries():
-        print fmtfunc(e)
 
 def do_edit(args):
     """Handle subtask "edit"."""
@@ -100,7 +80,7 @@ def _create_and_parse_args():
             help='Show films with rating better or equal than')
     listparser.add_argument('-w', '--worse-than', type=int,
             help='Show films with rating worse or equal than')
-    listparser.set_defaults(format='compact', func=do_list)
+    listparser.set_defaults(format='compact', func=listings.do_list)
 
     # edit section will be limited to the last one for the time being.
     editparser = subparser.add_parser('edit',
