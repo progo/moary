@@ -30,19 +30,23 @@ def do_add(args):
 def do_list(args):
     """CLI func to call when doing subtask "list". """
     if args.format == 'compact':
-        formatstring = '{movie}, {rating}, as seen {origdate}'
+        def fmtfunc(e):
+            return '{movie},   {rating},     ({origdate})'.format(**vars(e))
     elif args.format == 'full':
-        formatstring = (
-            '-------------------------------------------------------------\n'+
-            '{movie}\n'+
-            '{rating} points,     {origdate}\n'+
-            '{message}')
+        def fmtfunc(e):
+            return ('---------------------------------------------------\n'+
+                '{movie}\n'+
+                '{rating} points,   {imdburl}     ({origdate})\n'+
+                '{message}').format(movie=e.movie, rating=e.rating,
+                        imdburl=imdbutils.imdb_url(e.imdb),
+                        origdate=e.origdate, message=e.message)
     elif args.format == 'csv':
-        # TODO needs to escape ;s in content.
-        formatstring = '{movie};{rating};{origdate}'
+        def fmtfunc(e):
+            # TODO needs to escape ;s in content.
+            return '{movie};{rating};{origdate}'.format(**vars(e))
 
     for e in data.get_all_entries():
-        print formatstring.format(**vars(e))
+        print fmtfunc(e)
 
 def do_edit(args):
     """Handle subtask "edit"."""
