@@ -1,6 +1,6 @@
 """Contains the class Entry."""
 
-import time
+from datetime import datetime
 
 class Entry():
     """A movie diary entry."""
@@ -10,8 +10,9 @@ class Entry():
         self.rating = rating or 0
         self.imdb = imdb or ''
         self.message = message or ''
-        self.origdate = origdate or time.ctime()
-        self.update = update or time.ctime()
+        self.origdate = origdate or datetime.now()
+        self.update = update or self.origdate
 
     def __repr__(self):
-        return "{0} ({1})".format(self.movie, self.rating)
+        return "'{0}', r:{1}, i:'{2}'".format(
+                self.movie, self.rating, self.imdb)

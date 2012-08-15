@@ -11,15 +11,16 @@ CREATE = """CREATE TABLE IF NOT EXISTS movies
              rating real,
              imdb text,
              message text,
-             origdate text,
-             updated text);"""
+             origdate timestamp,
+             updated timestamp);"""
 
 DBFILE = "movies.db"
 DATADIR = "."
 
 def establish_connection():
     dbfileloc = os.path.join(sys.path[0], DATADIR, DBFILE)
-    con = sqlite3.connect(dbfileloc)
+    con = sqlite3.connect(dbfileloc,
+            detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
     con.execute(CREATE)
     con.commit()
     return con

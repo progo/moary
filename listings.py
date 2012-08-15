@@ -6,16 +6,18 @@ from entry import Entry
 
 from textwrap import fill
 
-
 def format_compact(e):
     """print entry e compactly in one line."""
-    return '({origdate}) {rating:<3}   {movie}'.format(**vars(e))
+    return '({date}) {rating:<3}   {movie}'.format(
+            date=e.origdate.strftime("%Y-%m-%d"),
+            rating=e.rating, 
+            movie=e.movie)
 
 def format_full(e):
     """print entry e in a nice, full form."""
     formatstring = ('-'*78 + '\n'+
                     '{movie}\n'+
-                    '{rating:<3} points,  {imdburl}   ({origdate})\n'+
+                    '{rating:<3} points        {imdburl}      ({longdate})\n'+
                     '{message}')
     if not e.imdb:
         imdburl = ' '*36  # apprx length of a would-be IMDB url
@@ -24,7 +26,7 @@ def format_full(e):
     return formatstring.format(movie=e.movie,
             rating=e.rating,
             imdburl=imdburl,
-            origdate=e.origdate,
+            longdate=e.origdate.strftime("%Y-%m-%d %H:%M"),
             message=fill(e.message))
 
 def format_csv(e):

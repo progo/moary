@@ -4,7 +4,7 @@ about it."""
 import re
 import subprocess
 import os
-import time
+import datetime
 
 import imdbutils
 
@@ -62,7 +62,6 @@ def edit_data_interactive(data, skip_imdb=False):
     if not skip_imdb:
         data = imdbutils.ensure_good_imdb_id(data)
 
-    # update timestamps
-    data.update = time.ctime()
+    data.update = datetime.datetime.now()
  
     return data
