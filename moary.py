@@ -33,6 +33,7 @@ def do_edit(args):
     if args.delete:
         if args.debug:
             print "Would delete:", vars(data.get_last())
+            return
         else:
             data.delete_entry()
             return
