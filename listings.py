@@ -9,7 +9,7 @@ from textwrap import fill
 
 def format_compact(e):
     """print entry e compactly in one line."""
-    return '{movie},   {rating},     ({origdate})'.format(**vars(e))
+    return '({origdate}) {rating:<3}   {movie}'.format(**vars(e))
 
 def format_full(e):
     """print entry e in a nice, full form."""
