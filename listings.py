@@ -4,19 +4,28 @@ import data
 import imdbutils
 from entry import Entry
 
+from textwrap import fill
+
 
 def format_compact(e):
     """print entry e compactly in one line."""
     return '{movie},   {rating},     ({origdate})'.format(**vars(e))
 
 def format_full(e):
-    """print entry e in full form."""
-    return ('---------------------------------------------------\n'+
-            '{movie}\n'+
-            '{rating} points,   {imdburl}     ({origdate})\n'+
-            '{message}').format(movie=e.movie, rating=e.rating,
-                        imdburl=imdbutils.imdb_url(e.imdb),
-                        origdate=e.origdate, message=e.message)
+    """print entry e in a nice, full form."""
+    formatstring = ('-'*78 + '\n'+
+                    '{movie}\n'+
+                    '{rating:<3} points,  {imdburl}   ({origdate})\n'+
+                    '{message}')
+    if not e.imdb:
+        imdburl = ' '*36  # apprx length of a would-be IMDB url
+    else:
+        imdburl = imdbutils.imdb_url(e.imdb)
+    return formatstring.format(movie=e.movie,
+            rating=e.rating,
+            imdburl=imdburl,
+            origdate=e.origdate,
+            message=fill(e.message))
 
 def format_csv(e):
     """print entry e in csv format."""
