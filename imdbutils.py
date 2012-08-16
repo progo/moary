@@ -1,5 +1,7 @@
 """IMDB related functions. """
 
+import re
+
 def imdb_url(imdbid):
     """Return an URL to a movie's IMDB page."""
     return "http://www.imdb.com/title/tt{0}/".format(imdbid)
@@ -13,8 +15,7 @@ def clean_imdb_id(s):
     Return empty if s doesn't appear to be valid at all.
     """
     s = s.strip(" /")
-    s = s.replace("http://www.imdb.com/title/", "")
-    s = s.replace("tt", "")
+    s = re.sub(r'\A.+title\/tt', '', s)
     if s.isdigit():
         return s
     return ""
