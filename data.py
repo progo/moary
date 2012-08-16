@@ -39,6 +39,21 @@ def get_last():
         cur.execute("SELECT * FROM movies ORDER BY rowid DESC LIMIT 1")
         return Entry(*cur.fetchone())
 
+def get_entries(filtermap=None, order=None):
+    """Return a list of Entries from the DB that satisfy the given conditions
+    in filtermap. Sort by conditions given in order."""
+    with establish_connection() as con:
+        cur = con.cursor()
+        query = "SELECT * FROM movies"
+        arguments = []
+        if filtermap:
+            query = query + " WHERE " + " AND ".join(filtermap.keys())
+            arguments.extend(filtermap.values())
+        if order:
+            query = query + " ORDER BY " + order
+        cur.execute(query, arguments)
+        return [Entry(*row) for row in cur.fetchall()]
+
 def get_all_entries():
     """return all entries from db."""
     # TODO wasteful...

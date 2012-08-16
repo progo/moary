@@ -46,6 +46,15 @@ def do_list(args):
     """CLI func to call when doing subtask "list". """
     fmtfunc = FORMATTERS[args.format]
 
-    for e in data.get_all_entries():
-        print fmtfunc(e)
+    filters = {}
+    order = ""
 
+    if args.title: filters["movie LIKE ?"] = "%" + args.title + "%"
+    if args.message: filters["message LIKE ?"] = "%" + args.title + "%"
+    if args.ge: filters["rating >= ?"] = args.ge
+    if args.gt: filters["rating > ?"] = args.gt
+    if args.le: filters["rating <= ?"] = args.le
+    if args.lt: filters["rating < ?"] = args.lt
+
+    for e in data.get_entries(filters, order):
+        print fmtfunc(e)
