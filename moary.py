@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import sys
 import argparse
 
 import edit_entry
@@ -102,12 +103,12 @@ def _create_and_parse_args():
             help='Delete last entry')
     editparser.set_defaults(func=do_edit)
 
+    if len(sys.argv) == 1: psr.parse_args(['-h'])
     args = psr.parse_args()
     return args
 
 if __name__ == '__main__':
     """parse args and direct execution towards the right func."""
-    import sys
     reload(sys)
     sys.setdefaultencoding('utf-8') # wtf
     args = _create_and_parse_args()
