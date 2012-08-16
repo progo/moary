@@ -1,7 +1,6 @@
 - I might consider integrating a Tweet sending option to this.
     - And more probably something to my own blog (TextPattern with XML-RPC)
 - Listings
-    - CSV ; escape
     - column selection for csv and compact?!
     - grep of course
     - sort

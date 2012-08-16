@@ -1,10 +1,12 @@
 """Provide functions to list, filter and sort entries."""
 
+import StringIO
+import csv
+from textwrap import fill
+
 import data
 import imdbutils
 from entry import Entry
-
-from textwrap import fill
 
 def format_compact(e):
     """print entry e compactly in one line."""
@@ -31,7 +33,10 @@ def format_full(e):
 
 def format_csv(e):
     """print entry e in csv format."""
-    return '{movie};{rating};{origdate}'.format(**vars(e))
+    output = StringIO.StringIO()
+    writer = csv.writer(output)
+    writer.writerow((e.movie, e.rating, e.origdate, e.message))
+    return output.getvalue()
 
 def do_list(args):
     """CLI func to call when doing subtask "list". """
