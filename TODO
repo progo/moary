@@ -1,7 +1,8 @@
 - I might consider integrating a Tweet sending option to this.
     - And more probably something to my own blog (TextPattern with XML-RPC)
 - Listings
-    - compact list form
-    - CSV, column selection
-    - expanded list form with titles, imdb urls and messages, cookiejar format
+    - CSV ; escape
+    - column selection for csv and compact?!
     - grep of course
+    - sort
+    - html report output
