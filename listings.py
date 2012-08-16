@@ -56,5 +56,9 @@ def do_list(args):
     if args.le: filters["rating <= ?"] = args.le
     if args.lt: filters["rating < ?"] = args.lt
 
-    for e in data.get_entries(filters, order):
-        print fmtfunc(e)
+    try:
+        for e in data.get_entries(filters, order):
+            print fmtfunc(e)
+    except IOError:
+        # can be caused by premature pipe closes (head etc)
+        return
