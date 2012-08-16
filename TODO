@@ -6,3 +6,5 @@
     - html report output
     - when sorting by ratings or movie names, we should merge watches of the
       same fil. Avg the ratings.
+- add entries with the IMDB id.
+    - no movie name then needed.
