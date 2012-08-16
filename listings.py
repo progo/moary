@@ -56,6 +56,15 @@ def do_list(args):
     if args.le: filters["rating <= ?"] = args.le
     if args.lt: filters["rating < ?"] = args.lt
 
+    if args.sort_name: order = "movie"
+    elif args.sort_rating: order = "rating"
+    if args.asc:
+        order = order or "rowid"
+        order = order + " ASC"
+    elif args.desc:
+        order = order or "rowid"
+        order = order + " DESC"
+
     try:
         for e in data.get_entries(filters, order):
             print fmtfunc(e)

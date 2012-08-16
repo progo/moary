@@ -85,6 +85,14 @@ def _create_and_parse_args():
             help='Show films with rating less or equal than')
     listparser.add_argument('--lt', type=float,
             help='Show films with rating less than')
+    listparser.add_argument('-S', '--sort-name', action='store_true',
+            help='Sort results by name.')
+    listparser.add_argument('-R', '--sort-rating', action='store_true',
+            help='Sort results by rating.')
+    listparser.add_argument('-A', '--asc', action='store_true',
+            help='Sort ascending')
+    listparser.add_argument('-D', '--desc', action='store_true',
+            help='Sort descending')
     listparser.set_defaults(format='compact', func=listings.do_list)
 
     # edit section will be limited to the last one for the time being.
