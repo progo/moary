@@ -31,15 +31,20 @@ def do_add(args):
 
 def do_edit(args):
     """Handle subtask "edit"."""
+    try:
+        lastentry = data.get_last()
+    except data.EmptyDBException:
+        print "Nothing in the DB!"
+        return
+
     if args.delete:
         if args.debug:
-            print "Would delete:", vars(data.get_last())
+            print "Would delete:", vars(lastentry)
             return
         else:
             data.delete_entry()
             return
     # at this point, only edit the last one
-    lastentry = data.get_last()
     edited = edit_entry.edit_data_interactive(lastentry,
             skip_imdb=args.skip_imdb)
     data.set_entry(edited)

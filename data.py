@@ -17,6 +17,9 @@ CREATE = """CREATE TABLE IF NOT EXISTS movies
 DBFILE = "movies.db"
 DATADIR = "."
 
+
+class EmptyDBException(): pass
+
 def establish_connection():
     dbfileloc = os.path.join(sys.path[0], DATADIR, DBFILE)
     con = sqlite3.connect(dbfileloc,
@@ -33,11 +36,14 @@ def store_entry(e):
         con.commit()
 
 def get_last():
-    """get and return the last entry saved."""
+    """get and return the last entry saved. Throw EmptyDBException if nothing
+    comes out."""
     with establish_connection() as con:
         cur = con.cursor()
         cur.execute("SELECT * FROM movies ORDER BY rowid DESC LIMIT 1")
-        return Entry(*cur.fetchone())
+        lastrow = cur.fetchone()
+        if not lastrow: raise EmptyDBException()
+        return Entry(*lastrow)
 
 def get_entries(filtermap=None, order=None):
     """Return a list of Entries from the DB that satisfy the given conditions
@@ -66,7 +72,9 @@ def __get_last_rowid(con):
     """get the last rowid. Uses an existing connection."""
     cur = con.cursor()
     cur.execute("SELECT rowid FROM movies ORDER BY rowid DESC LIMIT 1")
-    return cur.fetchone()[0]
+    lastid = cur.fetchone()
+    if not lastid: raise EmptyDBException()
+    return lastid[0]
 
 def set_entry(e, row_id=None):
     """set given entry with new values. If row_id not given, replace the last
