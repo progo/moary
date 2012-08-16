@@ -10,7 +10,7 @@ from entry import Entry
 
 def format_compact(e):
     """print entry e compactly in one line."""
-    return '({date}) {rating:<3}   {movie}'.format(
+    return '({date}) {rating:<4}    {movie}'.format(
             date=e.origdate.strftime("%Y-%m-%d"),
             rating=e.rating, 
             movie=e.movie)
@@ -19,7 +19,7 @@ def format_full(e):
     """print entry e in a nice, full form."""
     formatstring = ('-'*78 + '\n'+
                     '{movie}\n'+
-                    '{rating:<3} points        {imdburl}      ({longdate})\n'+
+                    '{rating:<4} points       {imdburl}      ({longdate})\n'+
                     '{message}')
     if not e.imdb:
         imdburl = ' '*36  # apprx length of a would-be IMDB url
