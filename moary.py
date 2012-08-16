@@ -77,10 +77,14 @@ def _create_and_parse_args():
             help='Grep titles.')
     listparser.add_argument('-m', '--message', action='store',
             help='Grep messages.')
-    listparser.add_argument('-b', '--better-than', type=int,
-            help='Show films with rating better or equal than')
-    listparser.add_argument('-w', '--worse-than', type=int,
-            help='Show films with rating worse or equal than')
+    listparser.add_argument('--ge', type=float,
+            help='Show films with rating greater or equal than')
+    listparser.add_argument('--gt', type=float,
+            help='Show films with rating greater than')
+    listparser.add_argument('--le', type=float,
+            help='Show films with rating less or equal than')
+    listparser.add_argument('--lt', type=float,
+            help='Show films with rating less than')
     listparser.set_defaults(format='compact', func=listings.do_list)
 
     # edit section will be limited to the last one for the time being.
