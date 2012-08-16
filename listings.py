@@ -38,14 +38,13 @@ def format_csv(e):
     writer.writerow((e.movie, e.rating, e.origdate, e.message))
     return output.getvalue()
 
+FORMATTERS = {'compact': format_compact,
+              'full': format_full,
+              'csv': format_csv}
+
 def do_list(args):
     """CLI func to call when doing subtask "list". """
-    if args.format == 'compact':
-        fmtfunc = format_compact
-    elif args.format == 'full':
-        fmtfunc = format_full
-    elif args.format == 'csv':
-        fmtfunc = format_csv
+    fmtfunc = FORMATTERS[args.format]
 
     for e in data.get_all_entries():
         print fmtfunc(e)
