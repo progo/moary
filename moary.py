@@ -17,6 +17,7 @@ def do_add(args):
     # 2. movie name not provided, IMDB provided (go batch)
     # 3. neither is provided, go interactive
     # TODO refactoring needed. Replace functions and so on.
+    db = data.DataFacilities()
     if args.movie:
         # 1. batch
         try:
@@ -57,12 +58,14 @@ def do_add(args):
     if args.debug:
         print newflick.__dict__
     else:
-        data.store_entry(newflick)
+        db.store_entry(newflick)
 
 def do_edit(args):
     """Handle subtask "edit"."""
+    db = data.DataFacilities()
+
     try:
-        lastentry = data.get_last()
+        lastentry = db.get_last()
     except data.EmptyDBException:
         print "Nothing in the DB!"
         return
@@ -72,12 +75,12 @@ def do_edit(args):
             print "Would delete:", vars(lastentry)
             return
         else:
-            data.delete_entry()
+            db.delete_entry()
             return
     # at this point, only edit the last one
     edited = edit_entry.edit_data_interactive(lastentry,
             skip_imdb=args.skip_imdb)
-    data.set_entry(edited)
+    db.set_entry(edited)
 
 def _create_and_parse_args():
     """Create the arg parser and do the magic."""

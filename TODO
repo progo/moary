@@ -6,4 +6,3 @@
     - html report output
     - when sorting by ratings or movie names, we should merge watches of the
       same fil. Avg the ratings.
-- Wrap data facilities into a class of its own. Reuse DB connection.

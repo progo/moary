@@ -65,8 +65,9 @@ def do_list(args):
         order = order or "rowid"
         order = order + " DESC"
 
+    db = data.DataFacilities()
     try:
-        for e in data.get_entries(filters, order):
+        for e in db.get_entries(filters, order):
             print fmtfunc(e)
     except IOError:
         # can be caused by premature pipe closes (head etc)
