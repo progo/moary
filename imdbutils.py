@@ -2,6 +2,8 @@
 
 import re
 
+class NoIMDBpyException(): pass
+
 def imdb_url(imdbid):
     """Return an URL to a movie's IMDB page."""
     return "http://www.imdb.com/title/tt{0}/".format(imdbid)
@@ -25,7 +27,7 @@ def ask_imdb_interactive(moviename):
     try:
         import imdb
     except ImportError:
-        return ""
+        raise NoIMDBpyException()
     ia = imdb.IMDb()
     ITEMS = 7
     run = ia.search_movie(moviename, results=ITEMS)
@@ -54,7 +56,10 @@ def ensure_good_imdb_id(entry):
     better one. Return entry with updated info."""
     clean_id = clean_imdb_id(entry.imdb)
     if not clean_id:
-        entry.imdb = ask_imdb_interactive(entry.movie)
+        try:
+            entry.imdb = ask_imdb_interactive(entry.movie)
+        except NoIMDBpyException:
+            pass #keep dirty id
     else:
         entry.imdb = clean_id
     return entry
