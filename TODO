@@ -9,3 +9,4 @@
 - add entries with the IMDB id.
     - no movie name then needed.
 - empty messages go "None" when edited. Should keep empty.
+- Wrap data facilities into a class of its own. Reuse DB connection.
