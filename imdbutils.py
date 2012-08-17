@@ -39,6 +39,9 @@ def ask_imdb_interactive(moviename):
         print "[" + str(counter) + "]   " + movie["long imdb title"]
         ids.append(movie.movieID)
         counter += 1
+    if counter == 1:
+        print "No movie matches."
+        return ''
     while True:
         try:
             user_input = raw_input(
