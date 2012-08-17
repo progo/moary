@@ -21,7 +21,7 @@ def do_add(args):
             return 0
     else:
         newflick = Entry(unicode(args.movie), args.rating,
-                args.imdb, unicode(args.message))
+                args.imdb, unicode(args.message or ""))
         if not args.skip_imdb:
             newflick = imdbutils.ensure_good_imdb_id(newflick)
     if args.debug:
