@@ -44,24 +44,24 @@ def fill_in_form(entry):
     return initial_message.format(entry.movie, entry.rating, entry.imdb,
             entry.message)
 
-def edit_data_interactive(data, skip_imdb=False):
+def edit_data_interactive(olddata, skip_imdb=False):
     """given the Entry, invoke editor on user to edit the entry. Return the
     Entry with possibly updated info."""
     import tempfile
     EDITOR = os.environ['EDITOR'] or "ed"
 
     with tempfile.NamedTemporaryFile() as tempfile:
-        tempfile.write(fill_in_form(data))
+        tempfile.write(fill_in_form(olddata))
         tempfile.flush()
         subprocess.call([EDITOR, tempfile.name])
-        data = parse_file(tempfile)
+        newdata = parse_file(tempfile)
 
-    if not data.movie:
-        raise UserCancel()
+        if not newdata.movie:
+            raise UserCancel()
 
-    if not skip_imdb:
-        data = imdbutils.ensure_good_imdb_id(data)
+        if not skip_imdb:
+            newdata = imdbutils.ensure_good_imdb_id(newdata)
 
-    data.update = datetime.datetime.now()
- 
-    return data
+        newdata.update = datetime.datetime.now()
+
+        return newdata
