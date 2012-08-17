@@ -24,14 +24,14 @@ def parse_file(f):
     f.seek(0)
 
     # now just go through the file format
-    data = Entry(movie=unicode(clean_line(f.readline())))
-    data.rating = clean_line(f.readline())
-    data.imdb = clean_line(f.readline())
+    entry = Entry(movie=unicode(clean_line(f.readline())))
+    entry.rating = clean_line(f.readline())
+    entry.imdb = clean_line(f.readline())
     f.readline()
-    data.message = unicode(f.read().strip())
-    return data
+    entry.message = unicode(f.read().strip())
+    return entry
 
-def fill_in_form(data):
+def fill_in_form(entry):
     """given movie dict, return filled-out form string for editors."""
     initial_message = (
         "Movie: {0}\n" +
@@ -39,10 +39,10 @@ def fill_in_form(data):
         "IMDB: {2}\n" +
         "----- Review -----\n" +
         "{3}")
-    if not data:
+    if not entry:
         return initial_message.format('','','','\n')
-    return initial_message.format(data.movie, data.rating, data.imdb,
-            data.message)
+    return initial_message.format(entry.movie, entry.rating, entry.imdb,
+            entry.message)
 
 def edit_data_interactive(data, skip_imdb=False):
     """given the Entry, invoke editor on user to edit the entry. Return the
