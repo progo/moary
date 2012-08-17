@@ -36,7 +36,7 @@ def format_csv(e):
     output = StringIO.StringIO()
     writer = csv.writer(output)
     writer.writerow((e.movie, e.rating, e.origdate, e.message))
-    return output.getvalue()
+    return output.getvalue().rstrip('\r\n ')
 
 FORMATTERS = {'compact': format_compact,
               'full': format_full,
