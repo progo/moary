@@ -12,18 +12,48 @@ from entry import Entry
 
 def do_add(args):
     """CLI func to call when doing subtask "add". """
-    if not args.movie:
+    # Three kinds of cases here in a mess:
+    # 1. movie name provided (possibly other info) (go batch)
+    # 2. movie name not provided, IMDB provided (go batch)
+    # 3. neither is provided, go interactive
+    # TODO refactoring needed. Replace functions and so on.
+    if args.movie:
+        # 1. batch
+        try:
+            clean_id = imdbutils.clean_imdb_id(args.imdb)
+        except imdbutils.BadIMDBIdException:
+            print "Bad IMDB id '{0}', skipping...".format(args.imdb)
+            clean_id = ''
+        newflick = Entry(unicode(args.movie),
+                         args.rating,
+                         clean_id,
+                         unicode(args.message or ""))
+        if not args.skip_imdb:
+            newflick = imdbutils.ensure_good_imdb_id_interactive(newflick)
+    elif args.imdb:
+        # 2. batch: No movie name given but something of an IMDB id
+        if args.skip_imdb:
+            print "Can't do this without querying IMDB!"
+            return
+        try:
+            moviename = imdbutils.query_imdb_name(args.imdb)
+            clean_id = imdbutils.clean_imdb_id(args.imdb)
+        except imdbutils.BadIMDBIdException:
+            print "Malformed IMDB id, aborting."
+            return
+        except imdbutils.NoIMDBpyException:
+            print "Can't do this without querying IMDB! (No IMDBpy)"
+            return
+        newflick = Entry(moviename, imdb=clean_id, rating=args.rating,
+                message=unicode(args.message or ""))
+    else:
+        # 3. interactive
         try:
             newflick = edit_entry.edit_data_interactive(None,
                     skip_imdb=args.skip_imdb)
         except edit_entry.UserCancel:
             print "Empty name, exiting..."
             return 0
-    else:
-        newflick = Entry(unicode(args.movie), args.rating,
-                args.imdb, unicode(args.message or ""))
-        if not args.skip_imdb:
-            newflick = imdbutils.ensure_good_imdb_id(newflick)
     if args.debug:
         print newflick.__dict__
     else:

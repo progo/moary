@@ -60,7 +60,7 @@ def edit_data_interactive(olddata, skip_imdb=False):
             raise UserCancel()
 
         if not skip_imdb:
-            newdata = imdbutils.ensure_good_imdb_id(newdata)
+            newdata = imdbutils.ensure_good_imdb_id_interactive(newdata)
 
         newdata.update = datetime.datetime.now()
 
