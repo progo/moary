@@ -50,7 +50,7 @@ def do_list(args):
     order = ""
 
     if args.title: filters["movie LIKE ?"] = "%" + args.title + "%"
-    if args.message: filters["message LIKE ?"] = "%" + args.title + "%"
+    if args.message: filters["message LIKE ?"] = "%" + args.message + "%"
     if args.ge: filters["rating >= ?"] = args.ge
     if args.gt: filters["rating > ?"] = args.gt
     if args.le: filters["rating <= ?"] = args.le
