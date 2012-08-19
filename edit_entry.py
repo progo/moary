@@ -5,6 +5,7 @@ import re
 import subprocess
 import os
 import datetime
+import tempfile
 
 import imdbutils
 
@@ -47,14 +48,13 @@ def fill_in_form(entry):
 def edit_data_interactive(olddata, skip_imdb=False):
     """given the Entry, invoke editor on user to edit the entry. Return the
     Entry with possibly updated info."""
-    import tempfile
     EDITOR = os.environ['EDITOR'] or "ed"
 
-    with tempfile.NamedTemporaryFile() as tempfile:
-        tempfile.write(fill_in_form(olddata))
-        tempfile.flush()
-        subprocess.call([EDITOR, tempfile.name])
-        newdata = parse_file(tempfile)
+    with tempfile.NamedTemporaryFile() as tf:
+        tf.write(fill_in_form(olddata))
+        tf.flush()
+        subprocess.call([EDITOR, tf.name])
+        newdata = parse_file(tf)
 
         if not newdata.movie:
             raise UserCancel()
