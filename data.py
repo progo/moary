@@ -31,8 +31,10 @@ class DataFacilities():
         con.commit()
         return con
 
-    def __init__(self, datadir=DATADIR, dbfile=DBFILE):
+    def __init__(self, datadir=None, dbfile=None):
         """Init sqlite3 connection. Use dbfile in datadir."""
+        datadir = datadir or DATADIR
+        dbfile = dbfile or DBFILE
         self.con = self.__establish_connection(datadir, dbfile)
 
     def store_entry(self, e):
