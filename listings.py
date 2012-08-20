@@ -65,7 +65,7 @@ def do_list(args):
         order = order or "rowid"
         order = order + " DESC"
 
-    db = data.DataFacilities()
+    db = data.DataFacilities(dbfile=args.db_file)
     try:
         for e in db.get_entries(filters, order):
             print fmtfunc(e)

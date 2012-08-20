@@ -17,7 +17,7 @@ def do_add(args):
     # 2. movie name not provided, IMDB provided (go batch)
     # 3. neither is provided, go interactive
     # TODO refactoring needed. Replace functions and so on.
-    db = data.DataFacilities()
+    db = data.DataFacilities(dbfile=args.db_file)
     if args.movie:
         # 1. batch
         try:
@@ -62,7 +62,7 @@ def do_add(args):
 
 def do_edit(args):
     """Handle subtask "edit"."""
-    db = data.DataFacilities()
+    db = data.DataFacilities(dbfile=args.db_file)
 
     try:
         lastentry = db.get_last()
@@ -91,6 +91,8 @@ def _create_and_parse_args(argv):
 
     psr.add_argument('-I', '--skip-imdb', action='store_true',
             help="Don't query IMDB")
+    psr.add_argument('-f', '--db-file', action='store',
+            help='Specify a database other than default.')
     psr.add_argument('-D', '--debug', action='store_true',
             help="Debug and dry-run.")
 
