@@ -82,7 +82,7 @@ def do_edit(args):
             skip_imdb=args.skip_imdb)
     db.set_entry(edited)
 
-def _create_and_parse_args():
+def _create_and_parse_args(argv):
     """Create the arg parser and do the magic."""
     psr = argparse.ArgumentParser(description="A movie diary.")
     subparser = psr.add_subparsers(
@@ -141,13 +141,17 @@ def _create_and_parse_args():
             help='Delete last entry')
     editparser.set_defaults(func=do_edit)
 
-    if len(sys.argv) == 1: psr.parse_args(['-h'])
-    args = psr.parse_args()
+    if len(argv) == 0: psr.parse_args(['-h'])
+    args = psr.parse_args(argv)
     return args
+
+def main(argv):
+    """ Inspect arguments and dispatch to subtasks. """
+    args = _create_and_parse_args(argv)
+    args.func(args)
 
 if __name__ == '__main__':
     """parse args and direct execution towards the right func."""
     reload(sys)
     sys.setdefaultencoding('utf-8') # wtf
-    args = _create_and_parse_args()
-    args.func(args)
+    main(sys.argv[1:])
