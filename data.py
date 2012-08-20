@@ -23,7 +23,8 @@ class DataFacilities():
     """Wrapped data interfaces in a class. (A closure would have done.)"""
 
     def __establish_connection(self, datadir, dbfile):
-        dbfileloc = os.path.join(sys.path[0], DATADIR, DBFILE)
+        dbfileloc = os.path.join(sys.path[0], datadir, dbfile)
+        if dbfile == ':memory:': dbfileloc = ':memory:'
         con = sqlite3.connect(dbfileloc,
                 detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
         con.execute(CREATE)
