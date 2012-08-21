@@ -28,6 +28,10 @@ class MoaryBatchAddTestCase(MoaryTestCase):
     COMMON_ARGS = ["-f", TESTDB]
 
     def setUp(self):
+        with Stub() as imdbutils:
+            from imdbutils import ask_imdb_interactive
+            ask_imdb_interactive(Dummy()) >> '1234567'
+
         try:
             os.remove(self.TESTDB)
         except OSError:
@@ -43,7 +47,6 @@ class TestGoodAddMovieOnly(MoaryBatchAddTestCase):
     """test adding only the movie name."""
     def testAdd(self):
         self.call("add ABC")
-        # actually, should call ask_imdb_interactive but doesn't.
         entry = data.DataFacilities(dbfile=self.TESTDB).get_last()
         self.assertEquals('ABC', entry.movie)
 
@@ -115,7 +118,8 @@ class TestAddFaultyIMDB(MoaryAddTestCase):
     Cool movie.
     """
  
-    def testSimpleAdd(self):
+    def testFaultyIMDBAdd(self):
+        """should clear the faulty id because no previous id provided."""
         entry = edit_entry.edit_data_interactive({}, skip_imdb=True)
         self.assertEquals(entry.movie, "def")
         self.assertEquals(entry.rating, '4')
