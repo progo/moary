@@ -31,6 +31,9 @@ class MoaryBatchAddTestCase(MoaryTestCase):
         with Stub() as imdbutils:
             from imdbutils import ask_imdb_interactive
             ask_imdb_interactive(Dummy()) >> '1234567'
+        with Stub() as imdbutils:
+            from imdbutils import query_imdb_name
+            query_imdb_name(Dummy()) >> 'Dummy Movie'
 
         try:
             os.remove(self.TESTDB)
@@ -49,9 +52,28 @@ class TestGoodAddMovieOnly(MoaryBatchAddTestCase):
         self.call("add ABC")
         entry = data.DataFacilities(dbfile=self.TESTDB).get_last()
         self.assertEquals('ABC', entry.movie)
+        self.assertEquals('1234567', entry.imdb)
 
 class TestGoodAddIMDBonly(MoaryBatchAddTestCase):
-    pass
+    """test adding by IMDB id only."""
+
+    def testAddIMDBurl(self):
+        self.call("add -i http://www.imdb.com/title/tt0233332")
+        entry = data.DataFacilities(dbfile=self.TESTDB).get_last()
+        self.assertEquals(entry.imdb, '0233332')
+        self.assertEquals(entry.movie, 'Dummy Movie')
+
+    def testAddIMDBid(self):
+        self.call("add -i 023332")
+        entry = data.DataFacilities(dbfile=self.TESTDB).get_last()
+        self.assertEquals(entry.imdb, '023332')
+        self.assertEquals(entry.movie, 'Dummy Movie')
+
+    def testAddIMDBfaulty(self):
+        self.call("add -i bsv")
+        # should have added nothing
+        db = data.DataFacilities(dbfile=self.TESTDB)
+        self.assertRaises(data.EmptyDBException, db.get_last)
 
 ### Adding from nothing
 
