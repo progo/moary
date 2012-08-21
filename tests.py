@@ -61,7 +61,7 @@ class TestAddByMovie(MoaryBatchTestCase):
         self.call("add ABC -i 999555 -m Nice -r 3")
         entry = data.DataFacilities(dbfile=self.TESTDB).get_last()
         self.assertEquals(entry.movie, u"ABC")
-        self.assertEquals(entry.imdb, u"999555")
+        self.assertEquals(entry.imdb, u"0999555")
         self.assertEquals(entry.rating, 3.0)
         self.assertEquals(entry.message, u"Nice")
 
@@ -84,7 +84,7 @@ class TestGoodAddIMDBonly(MoaryBatchTestCase):
     def testAddIMDBid(self):
         self.call("add -i 023332")
         entry = data.DataFacilities(dbfile=self.TESTDB).get_last()
-        self.assertEquals(entry.imdb, '023332')
+        self.assertEquals(entry.imdb, '0023332')
         self.assertEquals(entry.movie, 'Dummy Movie')
 
     def testAddIMDBfaulty(self):
@@ -134,7 +134,7 @@ class TestAddByMovie_SkipIMDB(MoaryBatchTestCase_SkippingIMDB):
         self.call("add ABC -i 999555 -m Nice -r 3")
         entry = data.DataFacilities(dbfile=self.TESTDB).get_last()
         self.assertEquals(entry.movie, u"ABC")
-        self.assertEquals(entry.imdb, u"999555")
+        self.assertEquals(entry.imdb, u"0999555")
         self.assertEquals(entry.rating, 3.0)
         self.assertEquals(entry.message, u"Nice")
 
@@ -188,7 +188,7 @@ class TestGoodAdd_SkipIMDB(MoaryAddTestCase):
         self.assertEquals(entry.movie, "ABC")
         self.assertEquals(entry.rating, '4')
         self.assertEquals(entry.message, "Cool movie.")
-        self.assertEquals(entry.imdb, '01234')
+        self.assertEquals(entry.imdb, '0001234')
 
 class TestAddNoIMDB_SkipIMDB(MoaryAddTestCase):
     """test a situation no IMDB id has been provided."""

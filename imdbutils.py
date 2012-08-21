@@ -21,7 +21,7 @@ def clean_imdb_id(s):
     s = s.strip(" /")
     s = re.sub(r'\A.+title\/tt', '', s)
     s = s.replace("tt", "")
-    if s.isdigit(): return s
+    if s.isdigit(): return s.zfill(7)
     raise BadIMDBIdException()
 
 def ask_imdb_interactive(moviename):
