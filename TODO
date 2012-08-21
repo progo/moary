@@ -7,3 +7,7 @@
     - when sorting by ratings or movie names, we should merge watches of the
       same fil. Avg the ratings.
 - Make moary look up the env variables for MOVIEDB. That'll be the unix way.
+- One way to simplify our mess: make ``args.imdb`` a function (pointing either
+  to ensure_good_imdb_id_interactive or something else.)
+    - not that good a solution since there are different usecases for
+      args.imdb.
