@@ -61,6 +61,10 @@ def edit_data_interactive(olddata, skip_imdb=False):
 
         if not skip_imdb:
             newdata = imdbutils.ensure_good_imdb_id_interactive(newdata)
+        else:
+            try: newdata.imdb = imdbutils.clean_imdb_id(newdata.imdb)
+            except imdbutils.BadIMDBIdException:
+                newdata.imdb = '' # will not pass the full covered test suite!
 
         newdata.update = datetime.datetime.now()
 
