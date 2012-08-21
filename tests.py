@@ -21,9 +21,9 @@ class FileMock(BytesIO):
 
 class MoaryTestCase(unittest.TestCase): pass
 
-### Test batch adds, black box baby. (Not exactly BB but closer...)
+### [Batch] adds, edits. We'll try to keep BB-y.
 
-class MoaryBatchAddTestCase(MoaryTestCase):
+class MoaryBatchTestCase(MoaryTestCase):
     TESTDB = "movies.db_tests"
     COMMON_ARGS = ["-f", TESTDB]
 
@@ -46,15 +46,33 @@ class MoaryBatchAddTestCase(MoaryTestCase):
     def call(self, cmdline):
         moary.main(self.COMMON_ARGS + cmdline.split())
 
-class TestGoodAddMovieOnly(MoaryBatchAddTestCase):
-    """test adding only the movie name."""
-    def testAdd(self):
+class TestAddByMovie(MoaryBatchTestCase):
+    """Test adding movie the usual way, not relying on IMDB only."""
+
+    def testAddMovieOnly(self):
+        """add just the movie"""
         self.call("add ABC")
         entry = data.DataFacilities(dbfile=self.TESTDB).get_last()
         self.assertEquals('ABC', entry.movie)
         self.assertEquals('1234567', entry.imdb)
 
-class TestGoodAddIMDBonly(MoaryBatchAddTestCase):
+    def testAddAllIn(self):
+        """pass in everything correctly"""
+        self.call("add ABC -i 999555 -m Nice -r 3")
+        entry = data.DataFacilities(dbfile=self.TESTDB).get_last()
+        self.assertEquals(entry.movie, u"ABC")
+        self.assertEquals(entry.imdb, u"999555")
+        self.assertEquals(entry.rating, 3.0)
+        self.assertEquals(entry.message, u"Nice")
+
+    def testAddFaultyIMDB(self):
+        """give movie and faulty imdb. Should indeed ask about it."""
+        self.call("add XYZ -i 999vc")
+        entry = data.DataFacilities(dbfile=self.TESTDB).get_last()
+        self.assertEquals(entry.movie, u"XYZ")
+        self.assertEquals(entry.imdb, u"1234567")
+
+class TestGoodAddIMDBonly(MoaryBatchTestCase):
     """test adding by IMDB id only."""
 
     def testAddIMDBurl(self):
@@ -75,7 +93,66 @@ class TestGoodAddIMDBonly(MoaryBatchAddTestCase):
         db = data.DataFacilities(dbfile=self.TESTDB)
         self.assertRaises(data.EmptyDBException, db.get_last)
 
-### Adding from nothing
+class TestAddAndDelete(MoaryBatchTestCase):
+    """test adding and deleting."""
+    def testAddAndDelete(self):
+        self.call("add ABC -i 123")
+        self.call("edit -d")
+        db = data.DataFacilities(dbfile=self.TESTDB)
+        self.assertRaises(data.EmptyDBException, db.get_last)
+        self.call("edit -d")
+
+class MoaryBatchTestCase_SkippingIMDB(MoaryTestCase):
+    """Define -I in arguments so that we'll run stuff without IMDB."""
+    TESTDB = "movies.db_tests"
+    COMMON_ARGS = ["-I", "-f", TESTDB]
+
+    def setUp(self):
+        try:
+            os.remove(self.TESTDB)
+        except OSError:
+            pass # file doesn't exist
+
+    def tearDown(self):
+        os.remove(self.TESTDB)
+
+    def call(self, cmdline):
+        moary.main(self.COMMON_ARGS + cmdline.split())
+
+class TestAddByMovie_SkipIMDB(MoaryBatchTestCase_SkippingIMDB):
+    """Test adding movie the usual way, not relying on IMDB at all."""
+
+    def testAddMovieOnly(self):
+        """add just the movie"""
+        self.call("add ABC")
+        entry = data.DataFacilities(dbfile=self.TESTDB).get_last()
+        self.assertEquals('ABC', entry.movie)
+        self.assertEquals('', entry.imdb)
+
+    def testAddAllIn(self):
+        """pass in everything correctly"""
+        self.call("add ABC -i 999555 -m Nice -r 3")
+        entry = data.DataFacilities(dbfile=self.TESTDB).get_last()
+        self.assertEquals(entry.movie, u"ABC")
+        self.assertEquals(entry.imdb, u"999555")
+        self.assertEquals(entry.rating, 3.0)
+        self.assertEquals(entry.message, u"Nice")
+
+    def testAddFaultyIMDB(self):
+        """give movie and faulty imdb. Should clear it."""
+        self.call("add XYZ -i 999vc")
+        entry = data.DataFacilities(dbfile=self.TESTDB).get_last()
+        self.assertEquals(entry.movie, u"XYZ")
+        self.assertEquals(entry.imdb, u"")
+
+class TestAddIMDBOnly_SkippingIMDB(MoaryBatchTestCase_SkippingIMDB):
+    """nonsense operation should do nothing."""
+    def testNonsenseOp(self):
+        self.call("add -i 1234567")
+        db = data.DataFacilities(dbfile=self.TESTDB)
+        self.assertRaises(data.EmptyDBException, db.get_last)
+
+### [Interactive] Adding from nothing
 
 class MoaryAddTestCase(MoaryTestCase):
     """This test case sets up canned responses as if coming from the user with
@@ -156,7 +233,7 @@ class TestEmptyAdd(MoaryAddTestCase):
         self.assertRaises(edit_entry.UserCancel,
             lambda: edit_entry.edit_data_interactive({}, skip_imdb=True))
 
-### Editing existing data
+### [Interactive] Editing existing data
 
 class MoaryEditTestCase(MoaryTestCase):
     """ Set up test cases with something predefined """
