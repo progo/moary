@@ -173,7 +173,7 @@ class MoaryAddTestCase(MoaryTestCase):
             from tempfile import NamedTemporaryFile
             NamedTemporaryFile() >> FileMockReadonly(self.filecontents)
 
-class TestGoodAdd(MoaryAddTestCase):
+class TestGoodAdd_SkipIMDB(MoaryAddTestCase):
     """test a situation everything has been provided."""
 
     filecontents = """Movie: ABC
@@ -190,7 +190,7 @@ class TestGoodAdd(MoaryAddTestCase):
         self.assertEquals(entry.message, "Cool movie.")
         self.assertEquals(entry.imdb, '01234')
 
-class TestAddNoIMDB(MoaryAddTestCase):
+class TestAddNoIMDB_SkipIMDB(MoaryAddTestCase):
     """test a situation no IMDB id has been provided."""
 
     filecontents = """Movie: def
@@ -207,7 +207,7 @@ class TestAddNoIMDB(MoaryAddTestCase):
         self.assertEquals(entry.imdb, '')
         self.assertEquals(entry.message, "Cool movie.")
 
-class TestAddFaultyIMDB(MoaryAddTestCase):
+class TestAddFaultyIMDB_SkipIMDB(MoaryAddTestCase):
     """test a situation a faulty IMDB id has been provided."""
 
     filecontents = """Movie: def
@@ -225,7 +225,7 @@ class TestAddFaultyIMDB(MoaryAddTestCase):
         self.assertEquals(entry.imdb, '')
         self.assertEquals(entry.message, "Cool movie.")
 
-class TestEmptyAdd(MoaryAddTestCase):
+class TestEmptyAdd_SkipIMDB(MoaryAddTestCase):
     """test a situation where the user provides nothing new. Should raise
     UserCancel."""
     filecontents = edit_entry.fill_in_form(None)
@@ -249,7 +249,7 @@ class MoaryEditTestCase(MoaryTestCase):
             from tempfile import NamedTemporaryFile
             NamedTemporaryFile() >> FileMock('')
 
-class TestNonEdit(MoaryEditTestCase):
+class TestNonEdit_SkipIMDB(MoaryEditTestCase):
     """Test edit where the user doesn't actually edit anything. Ensure nothing
     changes."""
     def testNonEdit(self):
