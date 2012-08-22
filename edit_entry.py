@@ -45,15 +45,19 @@ def fill_in_form(entry):
     return initial_message.format(entry.movie, entry.rating, entry.imdb,
             entry.message)
 
+def __invoke_editor(form, filehandle):
+    """write the form to filehandle. Provide NamedTemporaryFile."""
+    EDITOR = os.environ['EDITOR'] or "ed"
+    filehandle.write(form)
+    filehandle.flush()
+    subprocess.call([EDITOR, filehandle.name])
+
 def edit_data_interactive(olddata, skip_imdb=False):
     """given the Entry, invoke editor on user to edit the entry. Return the
     Entry with possibly updated info."""
-    EDITOR = os.environ['EDITOR'] or "ed"
 
     with tempfile.NamedTemporaryFile() as tf:
-        tf.write(fill_in_form(olddata))
-        tf.flush()
-        subprocess.call([EDITOR, tf.name])
+        __invoke_editor(fill_in_form(olddata), tf)
         newdata = parse_file(tf)
 
         if not newdata.movie:
