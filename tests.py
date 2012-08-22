@@ -66,7 +66,7 @@ class TestAddByMovie(MoaryBatchTestCase):
         self.assertEquals(entry.message, u"Nice")
 
     def testAddFaultyIMDB(self):
-        """give movie and faulty imdb. Should indeed ask about it."""
+        """give movie and faulty imdb. Should ask about it."""
         self.call("add XYZ -i 999vc")
         entry = data.DataFacilities(dbfile=self.TESTDB).get_last()
         self.assertEquals(entry.movie, u"XYZ")
@@ -145,7 +145,7 @@ class TestAddByMovie_SkipIMDB(MoaryBatchTestCase_SkippingIMDB):
         self.assertEquals(entry.movie, u"XYZ")
         self.assertEquals(entry.imdb, u"")
 
-class TestAddIMDBOnly_SkippingIMDB(MoaryBatchTestCase_SkippingIMDB):
+class TestAddIMDBOnly_SkipIMDB(MoaryBatchTestCase_SkippingIMDB):
     """nonsense operation should do nothing."""
     def testNonsenseOp(self):
         self.call("add -i 1234567")
@@ -173,6 +173,23 @@ class MoaryAddTestCase(MoaryTestCase):
             from tempfile import NamedTemporaryFile
             NamedTemporaryFile() >> FileMockReadonly(self.filecontents)
 
+class TestGoodAdd(MoaryAddTestCase):
+    """test a situation everything has been provided."""
+
+    filecontents = """Movie: ABC
+    Rating: 4
+    IMDB:  01234
+    ----- Review -----
+    Cool movie.
+    """
+ 
+    def testSimpleAdd(self):
+        entry = edit_entry.edit_data_interactive({})
+        self.assertEquals(entry.movie, "ABC")
+        self.assertEquals(entry.rating, '4')
+        self.assertEquals(entry.message, "Cool movie.")
+        self.assertEquals(entry.imdb, '0001234')
+
 class TestGoodAdd_SkipIMDB(MoaryAddTestCase):
     """test a situation everything has been provided."""
 
@@ -190,8 +207,26 @@ class TestGoodAdd_SkipIMDB(MoaryAddTestCase):
         self.assertEquals(entry.message, "Cool movie.")
         self.assertEquals(entry.imdb, '0001234')
 
+class TestAddNoIMDB(MoaryAddTestCase):
+    """test a situation where no IMDB id has been provided. Should ask about
+    it."""
+
+    filecontents = """Movie: def
+    Rating: 4
+    IMDB: 
+    ----- Review -----
+    Cool movie.
+    """
+ 
+    def testSimpleAdd(self):
+        entry = edit_entry.edit_data_interactive({})
+        self.assertEquals(entry.movie, "def")
+        self.assertEquals(entry.rating, '4')
+        self.assertEquals(entry.imdb, '1234567')
+        self.assertEquals(entry.message, "Cool movie.")
+
 class TestAddNoIMDB_SkipIMDB(MoaryAddTestCase):
-    """test a situation no IMDB id has been provided."""
+    """test a situation where no IMDB id has been provided."""
 
     filecontents = """Movie: def
     Rating: 4
@@ -205,6 +240,24 @@ class TestAddNoIMDB_SkipIMDB(MoaryAddTestCase):
         self.assertEquals(entry.movie, "def")
         self.assertEquals(entry.rating, '4')
         self.assertEquals(entry.imdb, '')
+        self.assertEquals(entry.message, "Cool movie.")
+
+class TestAddFaultyIMDB(MoaryAddTestCase):
+    """test a situation a faulty IMDB id has been provided. Should ask."""
+
+    filecontents = """Movie: def
+    Rating: 4
+    IMDB: vccv
+    ----- Review -----
+    Cool movie.
+    """
+ 
+    def testFaultyIMDBAdd(self):
+        """should ask"""
+        entry = edit_entry.edit_data_interactive({})
+        self.assertEquals(entry.movie, "def")
+        self.assertEquals(entry.rating, '4')
+        self.assertEquals(entry.imdb, '1234567')
         self.assertEquals(entry.message, "Cool movie.")
 
 class TestAddFaultyIMDB_SkipIMDB(MoaryAddTestCase):
@@ -225,13 +278,16 @@ class TestAddFaultyIMDB_SkipIMDB(MoaryAddTestCase):
         self.assertEquals(entry.imdb, '')
         self.assertEquals(entry.message, "Cool movie.")
 
-class TestEmptyAdd_SkipIMDB(MoaryAddTestCase):
+class TestEmptyAdd(MoaryAddTestCase):
     """test a situation where the user provides nothing new. Should raise
     UserCancel."""
     filecontents = edit_entry.fill_in_form(None)
-    def testEmptyAdd(self):
+    def testEmptyAdd_without_imdb(self):
         self.assertRaises(edit_entry.UserCancel,
             lambda: edit_entry.edit_data_interactive({}, skip_imdb=True))
+    def testEmptyAdd_with_imdb(self):
+        self.assertRaises(edit_entry.UserCancel,
+            lambda: edit_entry.edit_data_interactive({}))
 
 ### [Interactive] Editing existing data
 
