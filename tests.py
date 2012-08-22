@@ -305,16 +305,42 @@ class MoaryEditTestCase(MoaryTestCase):
             from tempfile import NamedTemporaryFile
             NamedTemporaryFile() >> FileMock('')
 
-class TestNonEdit_SkipIMDB(MoaryEditTestCase):
-    """Test edit where the user doesn't actually edit anything. Ensure nothing
-    changes."""
-    def testNonEdit(self):
-        old_entry = Entry("ABC", rating='3')
+class TestNonEdit(MoaryEditTestCase):
+    """Test edit where the user doesn't actually edit anything. Ensure that
+    nothing unwanted changes."""
+
+    def testNonEdit_full_info_with_imdb(self):
+        old_entry = Entry("ABC", imdb='0023332', rating='3', message='Cool.')
+        new_entry = edit_entry.edit_data_interactive(old_entry)
+        self.assertEquals(old_entry.movie, new_entry.movie)
+        self.assertEquals(old_entry.message, new_entry.message)
+        self.assertEquals(old_entry.imdb, new_entry.imdb)
+        self.assertEquals(old_entry.rating, new_entry.rating)
+
+    def testNonEdit_full_info_without_imdb(self):
+        old_entry = Entry("ABC", imdb='0023332', rating='3', message='Cool.')
         new_entry = edit_entry.edit_data_interactive(old_entry, skip_imdb=True)
         self.assertEquals(old_entry.movie, new_entry.movie)
         self.assertEquals(old_entry.message, new_entry.message)
         self.assertEquals(old_entry.imdb, new_entry.imdb)
         self.assertEquals(old_entry.rating, new_entry.rating)
+
+    def testNonEdit_name_only_with_imdb(self):
+        """null id has been queried."""
+        old_entry = Entry("ABC")
+        new_entry = edit_entry.edit_data_interactive(old_entry, skip_imdb=False)
+        self.assertEquals(old_entry.movie, new_entry.movie)
+        self.assertEquals(old_entry.message, new_entry.message)
+        self.assertEquals('1234567', new_entry.imdb)
+        self.assertEquals('0', new_entry.rating)
+
+    def testNonEdit_name_only_without_imdb(self):
+        old_entry = Entry("ABC")
+        new_entry = edit_entry.edit_data_interactive(old_entry, skip_imdb=True)
+        self.assertEquals(old_entry.movie, new_entry.movie)
+        self.assertEquals(old_entry.message, new_entry.message)
+        self.assertEquals('', new_entry.imdb)
+        self.assertEquals('0', new_entry.rating)
 
 if __name__ == '__main__':
     unittest.main()
