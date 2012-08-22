@@ -183,23 +183,12 @@ class TestGoodAdd(MoaryAddTestCase):
     Cool movie.
     """
  
-    def testSimpleAdd(self):
+    def testSimpleAdd_imdb(self):
         entry = edit_entry.edit_data_interactive({})
         self.assertEquals(entry.movie, "ABC")
         self.assertEquals(entry.rating, '4')
         self.assertEquals(entry.message, "Cool movie.")
         self.assertEquals(entry.imdb, '0001234')
-
-class TestGoodAdd_SkipIMDB(MoaryAddTestCase):
-    """test a situation everything has been provided."""
-
-    filecontents = """Movie: ABC
-    Rating: 4
-    IMDB:  01234
-    ----- Review -----
-    Cool movie.
-    """
- 
     def testSimpleAdd(self):
         entry = edit_entry.edit_data_interactive({}, skip_imdb=True)
         self.assertEquals(entry.movie, "ABC")
@@ -218,23 +207,12 @@ class TestAddNoIMDB(MoaryAddTestCase):
     Cool movie.
     """
  
-    def testSimpleAdd(self):
+    def testSimpleAdd_imdb(self):
         entry = edit_entry.edit_data_interactive({})
         self.assertEquals(entry.movie, "def")
         self.assertEquals(entry.rating, '4')
         self.assertEquals(entry.imdb, '1234567')
         self.assertEquals(entry.message, "Cool movie.")
-
-class TestAddNoIMDB_SkipIMDB(MoaryAddTestCase):
-    """test a situation where no IMDB id has been provided."""
-
-    filecontents = """Movie: def
-    Rating: 4
-    IMDB: 
-    ----- Review -----
-    Cool movie.
-    """
- 
     def testSimpleAdd(self):
         entry = edit_entry.edit_data_interactive({}, skip_imdb=True)
         self.assertEquals(entry.movie, "def")
@@ -243,7 +221,7 @@ class TestAddNoIMDB_SkipIMDB(MoaryAddTestCase):
         self.assertEquals(entry.message, "Cool movie.")
 
 class TestAddFaultyIMDB(MoaryAddTestCase):
-    """test a situation a faulty IMDB id has been provided. Should ask."""
+    """test a situation a faulty IMDB id has been provided.""" 
 
     filecontents = """Movie: def
     Rating: 4
@@ -252,24 +230,13 @@ class TestAddFaultyIMDB(MoaryAddTestCase):
     Cool movie.
     """
  
-    def testFaultyIMDBAdd(self):
-        """should ask"""
+    def testFaultyIMDBAdd_imdb(self):
+        """should query the id"""
         entry = edit_entry.edit_data_interactive({})
         self.assertEquals(entry.movie, "def")
         self.assertEquals(entry.rating, '4')
         self.assertEquals(entry.imdb, '1234567')
         self.assertEquals(entry.message, "Cool movie.")
-
-class TestAddFaultyIMDB_SkipIMDB(MoaryAddTestCase):
-    """test a situation a faulty IMDB id has been provided."""
-
-    filecontents = """Movie: def
-    Rating: 4
-    IMDB: vccv
-    ----- Review -----
-    Cool movie.
-    """
- 
     def testFaultyIMDBAdd(self):
         """should clear the faulty id because no previous id provided."""
         entry = edit_entry.edit_data_interactive({}, skip_imdb=True)
