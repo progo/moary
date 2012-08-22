@@ -6,6 +6,7 @@ import subprocess
 import os
 import datetime
 import tempfile
+import io
 
 import imdbutils
 
@@ -15,13 +16,15 @@ class UserCancel():
     """Exception when user decides to cancel the interactive scenes."""
     pass
 
-def parse_file(f):
-    """read the temp file containing rate and other stuff. Return an Entry."""
+def parse_string(string):
+    """Read in the [multiline] string and parse it into an Entry."""
+    # TODO could use a rewrite without lazy patches
 
     def clean_line(s):
         """remove initial label from the beginning of the line"""
         return re.sub(r"\A.*?: ?", "", s.strip()).strip()
 
+    f = io.BytesIO(string)
     f.seek(0)
 
     # now just go through the file format
@@ -45,20 +48,24 @@ def fill_in_form(entry):
     return initial_message.format(entry.movie, entry.rating, entry.imdb,
             entry.message)
 
-def __invoke_editor(form, filehandle):
-    """write the form to filehandle. Provide NamedTemporaryFile."""
+def invoke_editor(form, tempfilehandle):
+    """Invoke the editor on tempfilehandle. Write initial message 'form' in
+    first. Return the file fully read as string!"""
     EDITOR = os.environ['EDITOR'] or "ed"
-    filehandle.write(form)
-    filehandle.flush()
-    subprocess.call([EDITOR, filehandle.name])
+    tempfilehandle.write(form)
+    tempfilehandle.flush()
+    subprocess.call([EDITOR, tempfilehandle.name])
+    tempfilehandle.seek(0)
+    return tempfilehandle.read()
 
 def edit_data_interactive(olddata, skip_imdb=False):
     """given the Entry, invoke editor on user to edit the entry. Return the
     Entry with possibly updated info."""
 
     with tempfile.NamedTemporaryFile() as tf:
-        __invoke_editor(fill_in_form(olddata), tf)
-        newdata = parse_file(tf)
+        oldform = fill_in_form(olddata)
+        newform = invoke_editor(oldform, tf)
+        newdata = parse_string(newform)
 
         if not newdata.movie:
             raise UserCancel()
@@ -71,5 +78,6 @@ def edit_data_interactive(olddata, skip_imdb=False):
                 newdata.imdb = '' # will not pass the full covered test suite!
 
         newdata.update = datetime.datetime.now()
+        # TODO: I can't see it... is the origdate being preserved in edits?!
 
         return newdata
