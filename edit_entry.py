@@ -24,7 +24,7 @@ def parse_string(string):
         """remove initial label from the beginning of the line"""
         return re.sub(r"\A.*?: ?", "", s.strip()).strip()
 
-    f = io.BytesIO(string)
+    f = io.BytesIO(string.lstrip())
     f.seek(0)
 
     # now just go through the file format
