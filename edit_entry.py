@@ -78,6 +78,5 @@ def edit_data_interactive(olddata, skip_imdb=False):
                 newdata.imdb = '' # will not pass the full covered test suite!
 
         newdata.update = datetime.datetime.now()
-        # TODO: I can't see it... is the origdate being preserved in edits?!
 
         return newdata
