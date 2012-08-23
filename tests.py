@@ -2,7 +2,7 @@
 # Too late, too late.
 import os
 import unittest
-from ludibrio import Stub, Mock, Dummy
+from ludibrio import Stub, Mock, Dummy, any
 from io import BytesIO
 
 from entry import Entry
@@ -259,55 +259,139 @@ class TestEmptyAdd(MoaryAddTestCase):
 ### [Interactive] Editing existing data
 
 class MoaryEditTestCase(MoaryTestCase):
-    """ Set up test cases with something predefined """
+    """Test cases with an existing entry and provide changed edit form."""
 
     def setUp(self):
-        # ignore calls to $editor
-        with Stub() as subprocess:
-            from subprocess import call
-            call(Dummy()) >> None
-
         # set text we find from the file
         with Stub() as tempfile:
             from tempfile import NamedTemporaryFile
             NamedTemporaryFile() >> FileMock('')
 
-class TestNonEdit(MoaryEditTestCase):
-    """Test edit where the user doesn't actually edit anything. Ensure that
-    nothing unwanted changes."""
+    def set_edited_content(self, string):
+        with Stub() as edit_entry:
+            from edit_entry import invoke_editor
+            invoke_editor(any(), any()) >> string
 
-    def testNonEdit_full_info_with_imdb(self):
-        old_entry = Entry("ABC", imdb='0023332', rating='3', message='Cool.')
+class TestGoodEdits(MoaryEditTestCase):
+    """make good edits to good material"""
+
+    def testGoodEdit(self):
+        """change one bit."""
+        old_entry = Entry("Dland", rating='1', imdb='0999555', message='+1')
+ 
+        self.set_edited_content("""
+        Movie: DBland
+        Rating: 1
+        IMDB: 0999555
+        ----- Review -----
+        +1
+        """)
+ 
         new_entry = edit_entry.edit_data_interactive(old_entry)
-        self.assertEquals(old_entry.movie, new_entry.movie)
-        self.assertEquals(old_entry.message, new_entry.message)
-        self.assertEquals(old_entry.imdb, new_entry.imdb)
-        self.assertEquals(old_entry.rating, new_entry.rating)
+        self.assertEquals(new_entry.movie, "DBland")
+        self.assertEquals(new_entry.rating, old_entry.rating)
+        self.assertEquals(new_entry.message, old_entry.message)
+        self.assertEquals(new_entry.imdb, old_entry.imdb)
 
-    def testNonEdit_full_info_without_imdb(self):
-        old_entry = Entry("ABC", imdb='0023332', rating='3', message='Cool.')
+    def testGoodEdit_noIMDB(self):
+        """change one bit. Skip imdb."""
+        old_entry = Entry("Dland", rating='1', imdb='0999555', message='+1')
+ 
+        self.set_edited_content("""
+        Movie: DBland
+        Rating: 1
+        IMDB: 0999555
+        ----- Review -----
+        +1
+        """)
+ 
         new_entry = edit_entry.edit_data_interactive(old_entry, skip_imdb=True)
-        self.assertEquals(old_entry.movie, new_entry.movie)
-        self.assertEquals(old_entry.message, new_entry.message)
-        self.assertEquals(old_entry.imdb, new_entry.imdb)
-        self.assertEquals(old_entry.rating, new_entry.rating)
+        self.assertEquals(new_entry.movie, "DBland")
+        self.assertEquals(new_entry.rating, old_entry.rating)
+        self.assertEquals(new_entry.message, old_entry.message)
+        self.assertEquals(new_entry.imdb, old_entry.imdb)
 
-    def testNonEdit_name_only_with_imdb(self):
-        """null id has been queried."""
-        old_entry = Entry("ABC")
+    def testGoodEdits(self):
+        """change everything a bit."""
+        old_entry = Entry("ABC", rating='1', imdb='0999555', message='+1')
+
+        self.set_edited_content("""
+        Movie: DEZ
+        Rating: 0
+        IMDB: 0999000
+        ----- Review -----
+        Cool!
+        """)
+
         new_entry = edit_entry.edit_data_interactive(old_entry, skip_imdb=False)
-        self.assertEquals(old_entry.movie, new_entry.movie)
-        self.assertEquals(old_entry.message, new_entry.message)
-        self.assertEquals('1234567', new_entry.imdb)
-        self.assertEquals('0', new_entry.rating)
+        self.assertEquals(new_entry.movie, "DEZ")
+        self.assertEquals(new_entry.rating, '0')
+        self.assertEquals(new_entry.message, 'Cool!')
+        self.assertEquals(new_entry.imdb, '0999000')
 
-    def testNonEdit_name_only_without_imdb(self):
-        old_entry = Entry("ABC")
+    def testGoodEdits_noIMDB(self):
+        """change everything a bit. Skip IMDB."""
+        old_entry = Entry("ABC", rating='1', imdb='0999555', message='+1')
+
+        self.set_edited_content("""
+        Movie: DEZ
+        Rating: 0
+        IMDB: 0999000
+        ----- Review -----
+        Cool!
+        """)
+
         new_entry = edit_entry.edit_data_interactive(old_entry, skip_imdb=True)
-        self.assertEquals(old_entry.movie, new_entry.movie)
-        self.assertEquals(old_entry.message, new_entry.message)
-        self.assertEquals('', new_entry.imdb)
-        self.assertEquals('0', new_entry.rating)
+        self.assertEquals(new_entry.movie, "DEZ")
+        self.assertEquals(new_entry.rating, '0')
+        self.assertEquals(new_entry.message, 'Cool!')
+        self.assertEquals(new_entry.imdb, '0999000')
+
+    def testClearIMDB(self):
+        """clear the IMDB for a reason or another. New ID will be queried."""
+        old_entry = Entry("ABC", rating='1', imdb='0999555', message='+1')
+
+        self.set_edited_content("""
+        Movie: ABC
+        Rating: 0
+        IMDB: 
+        ----- Review -----
+        +1
+        """)
+
+        new_entry = edit_entry.edit_data_interactive(old_entry, skip_imdb=False)
+        self.assertEquals(new_entry.movie, "ABC")
+        self.assertEquals(new_entry.rating, '0')
+        self.assertEquals(new_entry.imdb, '1234567')
+
+    def testClearIMDB_noIMDB(self):
+        """clear the IMDB for a reason or another. ID will be cleared."""
+        old_entry = Entry("ABC", rating='1', imdb='0999555', message='+1')
+
+        self.set_edited_content("""
+        Movie: ABC
+        Rating: 0
+        IMDB: 
+        ----- Review -----
+        +1
+        """)
+
+        new_entry = edit_entry.edit_data_interactive(old_entry, skip_imdb=True)
+        self.assertEquals(new_entry.movie, "ABC")
+        self.assertEquals(new_entry.rating, '0')
+        self.assertEquals(new_entry.imdb, '')
+
+class TestNonEdits(MoaryEditTestCase):
+    """do nothing on edits. """
+    pass
+
+class TestEditFromGoodToBad(MoaryEditTestCase):
+    """make bad edits to good material."""
+    pass
+
+class TestEditFromBadToBad(MoaryEditTestCase):
+    """make bad edits to bad material."""
+    pass
 
 if __name__ == '__main__':
     unittest.main()
