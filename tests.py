@@ -1,5 +1,10 @@
 #!/usr/bin/python
-# Too late, too late.
+# coding=utf-8
+
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8') # wtf
+
 import os
 import unittest
 from ludibrio import Stub, Mock, Dummy, any
@@ -192,11 +197,32 @@ class TestGoodAdd(MoaryAddTestCase):
         self.assertEquals(entry.rating, '4')
         self.assertEquals(entry.message, "Cool movie.")
         self.assertEquals(entry.imdb, '0001234')
+
     def testSimpleAdd(self):
         entry = edit_entry.edit_data_interactive({}, skip_imdb=True)
         self.assertEquals(entry.movie, "ABC")
         self.assertEquals(entry.rating, '4')
         self.assertEquals(entry.message, "Cool movie.")
+        self.assertEquals(entry.imdb, '0001234')
+
+class TestGoodAddUTF8(MoaryAddTestCase):
+    """Test a situation everything has been provided. Try UTF8 capabilities.
+    Terrible issues: IMDB query itself should be tested here. Well, not
+    everything is going to be automatized and I hope we get away with simply
+    trying to store proper UTF8 content to DB."""
+
+    filecontents = """Movie: Yö
+    Rating: 4
+    IMDB:  01234
+    ----- Review -----
+    Sacré bleu!
+    """
+ 
+    def testSimpleAddU8_imdb(self):
+        entry = edit_entry.edit_data_interactive({})
+        self.assertEquals(entry.movie, "Yö")
+        self.assertEquals(entry.rating, '4')
+        self.assertEquals(entry.message, "Sacré bleu!")
         self.assertEquals(entry.imdb, '0001234')
 
 class TestAddNoIMDB(MoaryAddTestCase):
