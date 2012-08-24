@@ -16,6 +16,10 @@ class UserCancel():
     """Exception when user decides to cancel the interactive scenes."""
     pass
 
+def is_valid_rating(rating):
+    """Predicate to check if the rating is valid."""
+    return re.match(r'\A\d*\.?\d+\Z', str(rating))
+
 def parse_string(string):
     """Read in the [multiline] string and parse it into an Entry."""
     # TODO could use a rewrite without lazy patches
@@ -76,6 +80,9 @@ def edit_data_interactive(olddata, skip_imdb=False):
             try: newdata.imdb = imdbutils.clean_imdb_id(newdata.imdb)
             except imdbutils.BadIMDBIdException:
                 newdata.imdb = '' # will not pass the full covered test suite!
+
+        if olddata and olddata.rating and not is_valid_rating(newdata.rating):
+            newdata.rating = olddata.rating
 
         newdata.update = datetime.datetime.now()
 
