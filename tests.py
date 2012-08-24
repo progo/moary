@@ -383,7 +383,46 @@ class TestGoodEdits(MoaryEditTestCase):
 
 class TestNonEdits(MoaryEditTestCase):
     """do nothing on edits. """
-    pass
+
+    def testNothing(self):
+        """test non-edit with full info."""
+        old_entry = Entry("ABC", rating='1', imdb='0999555', message='Nice.')
+        self.set_edited_content(edit_entry.fill_in_form(old_entry))
+        new_entry = edit_entry.edit_data_interactive(old_entry, skip_imdb=False)
+        self.assertEquals(old_entry.message, new_entry.message)
+        self.assertEquals(old_entry.imdb, new_entry.imdb)
+        self.assertEquals(old_entry.movie, new_entry.movie)
+        self.assertEquals(old_entry.rating, new_entry.rating)
+
+    def testNothing_noIMDB(self):
+        """test non-edit with full info. Skip IMDB."""
+        old_entry = Entry("ABC", rating='1', imdb='0999555', message='Nice.')
+        self.set_edited_content(edit_entry.fill_in_form(old_entry))
+        new_entry = edit_entry.edit_data_interactive(old_entry, skip_imdb=True)
+        self.assertEquals(old_entry.message, new_entry.message)
+        self.assertEquals(old_entry.imdb, new_entry.imdb)
+        self.assertEquals(old_entry.movie, new_entry.movie)
+        self.assertEquals(old_entry.rating, new_entry.rating)
+
+    def testNothing_partial_info(self):
+        """test non-edit with partial (no IMDB) info. Will ask about the ID."""
+        old_entry = Entry("ABC", rating='1', message='Nice.')
+        self.set_edited_content(edit_entry.fill_in_form(old_entry))
+        new_entry = edit_entry.edit_data_interactive(old_entry, skip_imdb=False)
+        self.assertEquals(old_entry.message, new_entry.message)
+        self.assertEquals('1234567', new_entry.imdb)
+        self.assertEquals(old_entry.movie, new_entry.movie)
+        self.assertEquals(old_entry.rating, new_entry.rating)
+
+    def testNothing_partial_info_noIMDB(self):
+        """test non-edit with partial (no IMDB) info. Will skip the ID."""
+        old_entry = Entry("ABC", rating='1', message='Nice.')
+        self.set_edited_content(edit_entry.fill_in_form(old_entry))
+        new_entry = edit_entry.edit_data_interactive(old_entry, skip_imdb=True)
+        self.assertEquals(old_entry.message, new_entry.message)
+        self.assertEquals(old_entry.imdb, new_entry.imdb)
+        self.assertEquals(old_entry.movie, new_entry.movie)
+        self.assertEquals(old_entry.rating, new_entry.rating)
 
 class TestEditFromGoodToBad(MoaryEditTestCase):
     """make bad edits to good material."""
