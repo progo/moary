@@ -166,12 +166,15 @@ class MoaryAddTestCase(MoaryTestCase):
         # ignore calls to $editor
         with Stub() as subprocess:
             from subprocess import call
-            call(Dummy()) >> None
+            call(any()) >> None
+        with Stub() as edit_entry:
+            from edit_entry import invoke_editor
+            invoke_editor(any(),any()) >> self.filecontents
 
         # set text we find from the file
         with Stub() as tempfile:
             from tempfile import NamedTemporaryFile
-            NamedTemporaryFile() >> FileMockReadonly(self.filecontents)
+            NamedTemporaryFile() >> FileMockReadonly('')
 
 class TestGoodAdd(MoaryAddTestCase):
     """test a situation everything has been provided."""
