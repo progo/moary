@@ -249,6 +249,24 @@ class TestAddNoIMDB(MoaryAddTestCase):
         self.assertEquals(entry.imdb, '')
         self.assertEquals(entry.message, "Cool movie.")
 
+class TestAddBadRating(MoaryAddTestCase):
+    """Test adding with bad rating.""" 
+
+    filecontents = """Movie: Balzone
+    Rating: +
+    IMDB: 
+    ----- Review -----
+    Cool.
+    """
+ 
+    def testBadRating(self):
+        """should clear the bad rating to 0."""
+        entry = edit_entry.edit_data_interactive({}, skip_imdb=True)
+        self.assertEquals(entry.movie, "Balzone")
+        self.assertEquals(entry.rating, '0')
+        self.assertEquals(entry.imdb, '')
+        self.assertEquals(entry.message, "Cool.")
+
 class TestAddFaultyIMDB(MoaryAddTestCase):
     """test a situation a faulty IMDB id has been provided.""" 
 

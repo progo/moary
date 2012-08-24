@@ -83,6 +83,8 @@ def edit_data_interactive(olddata, skip_imdb=False):
 
         if olddata and olddata.rating and not is_valid_rating(newdata.rating):
             newdata.rating = olddata.rating
+        elif not is_valid_rating(newdata.rating):
+            newdata.rating = '0'
 
         newdata.update = datetime.datetime.now()
 
