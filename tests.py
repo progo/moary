@@ -429,7 +429,68 @@ class TestNonEdits(MoaryEditTestCase):
 
 class TestEditFromGoodToBad(MoaryEditTestCase):
     """make bad edits to good material."""
-    pass
+
+    def testBadIMDB(self):
+        """full material, change to crappy imdb. Should ask about new one."""
+        old_entry = Entry("ABC", rating='1', imdb='0999555', message='Nice.')
+
+        self.set_edited_content("""
+        Movie: ABC
+        Rating: 1
+        IMDB: aybabtu
+        ----- Review -----
+        Nice, isn't it.
+        """)
+
+        new_entry = edit_entry.edit_data_interactive(old_entry, skip_imdb=False)
+        self.assertEquals(old_entry.movie, new_entry.movie)
+        self.assertEquals(new_entry.imdb, '1234567')
+
+    def testBadIMDB_skipIMDB(self):
+        """full material, change to crappy imdb. Should keep the old one!"""
+        old_entry = Entry("ABC", rating='1', imdb='0999555', message='Nice.')
+
+        self.set_edited_content("""
+        Movie: ABC
+        Rating: 1
+        IMDB: aybabtu
+        ----- Review -----
+        Nice, isn't it.
+        """)
+
+        new_entry = edit_entry.edit_data_interactive(old_entry, skip_imdb=True)
+        self.assertEquals(old_entry.movie, new_entry.movie)
+        self.assertEquals(new_entry.imdb, old_entry.imdb)
+
+    def testClearMovieName(self):
+        """empty the name field. Should probably raise UserCancel."""
+        old_entry = Entry("ABC", rating='1', imdb='0999555', message='Nice.')
+
+        self.set_edited_content("""
+        Movie:
+        Rating: 1
+        IMDB: 0999555
+        ----- Review -----
+        Nice, isn't it.
+        """)
+
+        self.assertRaises(edit_entry.UserCancel,
+                lambda: edit_entry.edit_data_interactive({}, skip_imdb=False))
+
+    def testBadRating(self):
+        """push something nonnumeric to rating. Should keep the old rating."""
+        old_entry = Entry("ABC", rating='1', imdb='0999555', message='Nice.')
+
+        self.set_edited_content("""
+        Movie: ABC
+        Rating: -
+        IMDB: 0999555
+        ----- Review -----
+        Nice, isn't it.
+        """)
+
+        new_entry = edit_entry.edit_data_interactive(old_entry, skip_imdb=False)
+        self.assertEquals(old_entry.rating, new_entry.rating)
 
 class TestEditFromBadToBad(MoaryEditTestCase):
     """make bad edits to bad material."""
