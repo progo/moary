@@ -494,6 +494,9 @@ class TestEditFromGoodToBad(MoaryEditTestCase):
 
 class TestEditFromBadToBad(MoaryEditTestCase):
     """make bad edits to bad material."""
+    # Not sure if this is needed. After all, we should aim to only store "good"
+    # entries in the databases. What constitutes to a bad entry. Not everyone
+    # fancies giving a rating or a message. The IMDB id isn't required either.
     pass
 
 if __name__ == '__main__':
