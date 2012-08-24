@@ -11,3 +11,5 @@
   to ensure_good_imdb_id_interactive or something else.)
     - not that good a solution since there are different usecases for
       args.imdb.
+- Query IMDB to print a random bit of trivia about the movie after inserted.
+  (Of course skip that if going batch or the IMDB has been given already.)
