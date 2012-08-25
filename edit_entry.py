@@ -77,9 +77,10 @@ def edit_data_interactive(olddata, skip_imdb=False):
         if not skip_imdb:
             newdata = imdbutils.ensure_good_imdb_id_interactive(newdata)
         else:
-            try: newdata.imdb = imdbutils.clean_imdb_id(newdata.imdb)
+            try:
+                newdata.imdb = imdbutils.clean_imdb_id(newdata.imdb)
             except imdbutils.BadIMDBIdException:
-                newdata.imdb = '' # will not pass the full covered test suite!
+                newdata.imdb = olddata.imdb if olddata else ''
 
         if olddata and olddata.rating and not is_valid_rating(newdata.rating):
             newdata.rating = olddata.rating
