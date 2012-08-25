@@ -35,10 +35,10 @@ class MoaryBatchTestCase(MoaryTestCase):
     def setUp(self):
         with Stub() as imdbutils:
             from imdbutils import ask_imdb_interactive
-            ask_imdb_interactive(Dummy()) >> '1234567'
+            ask_imdb_interactive(any()) >> '1234567'
         with Stub() as imdbutils:
             from imdbutils import query_imdb_name
-            query_imdb_name(Dummy()) >> 'Dummy Movie'
+            query_imdb_name(any()) >> 'Dummy Movie'
 
         try:
             os.remove(self.TESTDB)
