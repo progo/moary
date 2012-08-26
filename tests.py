@@ -7,13 +7,28 @@ sys.setdefaultencoding('utf-8') # wtf
 
 import os
 import unittest
-from ludibrio import Stub, Mock, Dummy, any
 from io import BytesIO
+
+#import pkg_resources
+#pkg_resources.require("ludibrio==3.0.3")
+from ludibrio import Stub, Mock, any
 
 from entry import Entry
 import moary
 import edit_entry, data
+import imdbutils
 
+WITH_IMDBPY = True
+
+# mock imdbutils here instead of ludibrio.
+if WITH_IMDBPY:
+    imdbutils.ask_imdb_interactive = lambda x: '1234567'
+    imdbutils.query_imdb_name = lambda x: 'Dummy Movie'
+else:
+    def throw_noimdbpy(x): raise imdbutils.NoIMDBpyException()
+    imdbutils.ask_imdb_interactive = throw_noimdbpy
+    imdbutils.query_imdb_name = throw_noimdbpy
+ 
 class FileMockReadonly(BytesIO):
     """Mock temporaryfile that has a .name and something else.
     Ignore writes."""
@@ -33,13 +48,6 @@ class MoaryBatchTestCase(MoaryTestCase):
     COMMON_ARGS = ["-f", TESTDB]
 
     def setUp(self):
-        with Stub() as imdbutils:
-            from imdbutils import ask_imdb_interactive
-            ask_imdb_interactive(any()) >> '1234567'
-        with Stub() as imdbutils:
-            from imdbutils import query_imdb_name
-            query_imdb_name(any()) >> 'Dummy Movie'
-
         try:
             os.remove(self.TESTDB)
         except OSError:

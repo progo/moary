@@ -2,8 +2,8 @@
 
 import re
 
-class NoIMDBpyException(): pass
-class BadIMDBIdException(): pass
+class NoIMDBpyException(Exception): pass
+class BadIMDBIdException(Exception): pass
 
 def imdb_url(imdbid):
     """Return an URL to a movie's IMDB page."""
