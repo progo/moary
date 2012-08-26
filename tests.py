@@ -6,6 +6,7 @@ reload(sys)
 sys.setdefaultencoding('utf-8') # wtf
 
 import os
+import sys
 import unittest
 from io import BytesIO
 
@@ -18,16 +19,9 @@ import moary
 import edit_entry, data
 import imdbutils
 
-WITH_IMDBPY = True
-
 # mock imdbutils here instead of ludibrio.
-if WITH_IMDBPY:
-    imdbutils.ask_imdb_interactive = lambda x: '1234567'
-    imdbutils.query_imdb_name = lambda x: 'Dummy Movie'
-else:
-    def throw_noimdbpy(x): raise imdbutils.NoIMDBpyException()
-    imdbutils.ask_imdb_interactive = throw_noimdbpy
-    imdbutils.query_imdb_name = throw_noimdbpy
+imdbutils.ask_imdb_interactive = lambda x: '1234567'
+imdbutils.query_imdb_name = lambda x: 'Dummy Movie'
  
 class FileMockReadonly(BytesIO):
     """Mock temporaryfile that has a .name and something else.
@@ -115,22 +109,10 @@ class TestAddAndDelete(MoaryBatchTestCase):
         self.assertRaises(data.EmptyDBException, db.get_last)
         self.call("edit -d")
 
-class MoaryBatchTestCase_SkippingIMDB(MoaryTestCase):
+class MoaryBatchTestCase_SkippingIMDB(MoaryBatchTestCase):
     """Define -I in arguments so that we'll run stuff without IMDB."""
     TESTDB = "movies.db_tests"
     COMMON_ARGS = ["-I", "-f", TESTDB]
-
-    def setUp(self):
-        try:
-            os.remove(self.TESTDB)
-        except OSError:
-            pass # file doesn't exist
-
-    def tearDown(self):
-        os.remove(self.TESTDB)
-
-    def call(self, cmdline):
-        moary.main(self.COMMON_ARGS + cmdline.split())
 
 class TestAddByMovie_SkipIMDB(MoaryBatchTestCase_SkippingIMDB):
     """Test adding movie the usual way, not relying on IMDB at all."""
@@ -550,6 +532,103 @@ class TestEditFromBadToBad(MoaryEditTestCase):
     # entries in the databases. What constitutes to a bad entry. Not everyone
     # fancies giving a rating or a message. The IMDB id isn't required either.
     pass
+
+### Test stuff when IMDBpy is not present.
+
+## Batch stuff
+
+class TestWithoutIMDBpy(MoaryBatchTestCase):
+    """Run batch tests with IMDBpy disabled."""
+    def setUp(self):
+        MoaryBatchTestCase.setUp(self)
+        def throw_noimdbpy(x): raise imdbutils.NoIMDBpyException()
+        imdbutils.ask_imdb_interactive = throw_noimdbpy
+        imdbutils.query_imdb_name = throw_noimdbpy
+    def tearDown(self):
+        MoaryBatchTestCase.tearDown(self)
+        imdbutils.ask_imdb_interactive = lambda x: '1234567'
+        imdbutils.query_imdb_name = lambda x: 'Dummy Movie'
+
+    def testAddIMDBidonly(self):
+        """try adding with IMDB id only. Shouldn't insert anything."""
+        self.call("add -i http://www.imdb.com/title/tt0233332")
+        self.call("add -i 0233332")
+        self.call("add -i tt0233332")
+        db = data.DataFacilities(dbfile=self.TESTDB)
+        self.assertRaises(data.EmptyDBException, db.get_last)
+
+    def testAddByMovie(self):
+        """add with movie name only. IMDB should go ''. """
+        self.call("add ABC")
+        entry = data.DataFacilities(dbfile=self.TESTDB).get_last()
+        self.assertEquals('ABC', entry.movie)
+        self.assertEquals('', entry.imdb)
+
+    def testAddAllIn(self):
+        """pass in everything correctly"""
+        self.call("add ABC -i 999555 -m Nice -r 3")
+        entry = data.DataFacilities(dbfile=self.TESTDB).get_last()
+        self.assertEquals(entry.movie, u"ABC")
+        self.assertEquals(entry.imdb, u"0999555")
+        self.assertEquals(entry.rating, 3.0)
+        self.assertEquals(entry.message, u"Nice")
+
+    def testAddFaultyIMDB(self):
+        """give movie and faulty imdb. Should clear it."""
+        self.call("add XYZ -i 999vc")
+        entry = data.DataFacilities(dbfile=self.TESTDB).get_last()
+        self.assertEquals(entry.movie, u"XYZ")
+        self.assertEquals(entry.imdb, '')
+
+# ugh how wet.
+class TestWithoutIMDBpy_skipIMDB(MoaryBatchTestCase):
+    """Run batch tests with IMDBpy disabled."""
+    def setUp(self):
+        MoaryBatchTestCase.setUp(self)
+        def throw_noimdbpy(x): raise imdbutils.NoIMDBpyException()
+        imdbutils.ask_imdb_interactive = throw_noimdbpy
+        imdbutils.query_imdb_name = throw_noimdbpy
+    def tearDown(self):
+        MoaryBatchTestCase.tearDown(self)
+        imdbutils.ask_imdb_interactive = lambda x: '1234567'
+        imdbutils.query_imdb_name = lambda x: 'Dummy Movie'
+
+    def testAddIMDBidonly(self):
+        """try adding with IMDB id only. Shouldn't insert anything."""
+        self.call("add -i http://www.imdb.com/title/tt0233332")
+        self.call("add -i 0233332")
+        self.call("add -i tt0233332")
+        db = data.DataFacilities(dbfile=self.TESTDB)
+        self.assertRaises(data.EmptyDBException, db.get_last)
+
+    def testAddByMovie(self):
+        """add with movie name only. IMDB should go ''. """
+        self.call("add ABC")
+        entry = data.DataFacilities(dbfile=self.TESTDB).get_last()
+        self.assertEquals('ABC', entry.movie)
+        self.assertEquals('', entry.imdb)
+
+    def testAddAllIn(self):
+        """pass in everything correctly"""
+        self.call("add ABC -i 999555 -m Nice -r 3")
+        entry = data.DataFacilities(dbfile=self.TESTDB).get_last()
+        self.assertEquals(entry.movie, u"ABC")
+        self.assertEquals(entry.imdb, u"0999555")
+        self.assertEquals(entry.rating, 3.0)
+        self.assertEquals(entry.message, u"Nice")
+
+    def testAddFaultyIMDB(self):
+        """give movie and faulty imdb. Should clear it."""
+        self.call("add XYZ -i 999vc")
+        entry = data.DataFacilities(dbfile=self.TESTDB).get_last()
+        self.assertEquals(entry.movie, u"XYZ")
+        self.assertEquals(entry.imdb, '')
+
+### Interactive adds without IMDBpy
+
+
+### Interactive edits without IMDBpy
+
 
 if __name__ == '__main__':
     unittest.main()
