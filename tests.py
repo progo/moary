@@ -726,6 +726,102 @@ class TestIntAddsWithoutIMDBpy(MoaryAddTestCase):
     
 # Interactive edits without IMDBpy
 
+class TestIntEditsWithoutIMDBpy(MoaryEditTestCase):
+    """Test interactive edits (good and bad) with IMDBpy disabled."""
+
+    def setUp(self):
+        MoaryEditTestCase.setUp(self)
+        def throw_noimdbpy(x): raise imdbutils.NoIMDBpyException()
+        imdbutils.ask_imdb_interactive = throw_noimdbpy
+        imdbutils.query_imdb_name = throw_noimdbpy
+    def tearDown(self):
+        MoaryEditTestCase.tearDown(self)
+        imdbutils.ask_imdb_interactive = lambda x: '1234567'
+        imdbutils.query_imdb_name = lambda x: 'Dummy Movie'
+
+    def testGoodEdit(self):
+        """good edit, modify everything a bit."""
+        old_entry = Entry("ABC", rating='1', imdb='0999555', message='+1')
+
+        self.set_edited_content("""
+        Movie: DEZ
+        Rating: 0
+        IMDB: 0999000
+        ----- Review -----
+        Cool!
+        """)
+
+        new_entry = edit_entry.edit_data_interactive(old_entry, skip_imdb=False)
+        self.assertEquals(new_entry.movie, "DEZ")
+        self.assertEquals(new_entry.rating, '0')
+        self.assertEquals(new_entry.message, 'Cool!')
+        self.assertEquals(new_entry.imdb, '0999000')
+
+    def testClearIMDB(self):
+        """clear the IMDB for a reason or another. Should clear."""
+        old_entry = Entry("ABC", rating='1', imdb='0999555', message='+1')
+
+        self.set_edited_content("""
+        Movie: ABC
+        Rating: 0
+        IMDB: 
+        ----- Review -----
+        +1
+        """)
+
+        new_entry = edit_entry.edit_data_interactive(old_entry, skip_imdb=False)
+        self.assertEquals(new_entry.movie, "ABC")
+        self.assertEquals(new_entry.rating, '0')
+        self.assertEquals(new_entry.imdb, '')
+
+    def testClearIMDB_noIMDB(self):
+        """clear the IMDB for a reason or another. ID will be cleared."""
+        old_entry = Entry("ABC", rating='1', imdb='0999555', message='+1')
+
+        self.set_edited_content("""
+        Movie: ABC
+        Rating: 0
+        IMDB: 
+        ----- Review -----
+        +1
+        """)
+
+        new_entry = edit_entry.edit_data_interactive(old_entry, skip_imdb=True)
+        self.assertEquals(new_entry.movie, "ABC")
+        self.assertEquals(new_entry.rating, '0')
+        self.assertEquals(new_entry.imdb, '')
+
+    def testBadIMDB(self):
+        """full material, change to crappy imdb. Should keep the old one!"""
+        old_entry = Entry("ABC", rating='1', imdb='0999555', message='Nice.')
+
+        self.set_edited_content("""
+        Movie: ABC
+        Rating: 1
+        IMDB: aybabtu
+        ----- Review -----
+        Nice, isn't it.
+        """)
+
+        new_entry = edit_entry.edit_data_interactive(old_entry, skip_imdb=False)
+        self.assertEquals(old_entry.movie, new_entry.movie)
+        self.assertEquals(new_entry.imdb, '0999555')
+
+    def testBadIMDB_skipIMDB(self):
+        """full material, change to crappy imdb. Should keep the old one!"""
+        old_entry = Entry("ABC", rating='1', imdb='0999555', message='Nice.')
+
+        self.set_edited_content("""
+        Movie: ABC
+        Rating: 1
+        IMDB: aybabtu
+        ----- Review -----
+        Nice, isn't it.
+        """)
+
+        new_entry = edit_entry.edit_data_interactive(old_entry, skip_imdb=True)
+        self.assertEquals(old_entry.movie, new_entry.movie)
+        self.assertEquals(new_entry.imdb, old_entry.imdb)
 
 if __name__ == '__main__':
     unittest.main()
