@@ -1,6 +1,9 @@
 """IMDB related functions. """
 
 import re
+from entry import Entry
+
+FORCE_SKIP = False # Ignore IMDBpy in JWD. Never set this outside testing!
 
 class NoIMDBpyException(Exception): pass
 class BadIMDBIdException(Exception): pass
@@ -69,18 +72,56 @@ def query_imdb_name(imdb_id):
     movie = ia.get_movie(clean_id)
     return movie["title"]
 
-def ensure_good_imdb_id_interactive(entry):
-    """Cleans the entry's imdb id. If it is not up to task, ask interactively
-    better one. Return entry with updated info."""
+def is_valid_id(imdb_id):
+    """Simple predicate to validate IMDB id."""
     try:
-        clean_id = clean_imdb_id(entry.imdb)
+        clean_imdb_id(imdb_id)
+        return True
     except BadIMDBIdException:
-        clean_id = '' # we'll ask for new one
-    if not clean_id:
-        try:
-            entry.imdb = ask_imdb_interactive(entry.movie)
-        except NoIMDBpyException:
-            pass #keep dirty id
+        return False
+
+def just_work_dammit(entry, oldentry=None, skip=False):
+    """Get an entry with old ID and movie name, clean it and return good IMDB
+    id. Use 'skip' to go non-interactive. Don't raise anything."""
+
+    try: import imdb
+    except ImportError:
+        skip = True
+
+    if FORCE_SKIP: skip=True # for testing
+
+    oldentry = oldentry or Entry('')
+
+    if skip:
+        if is_valid_id(entry.imdb):
+            new_id = clean_imdb_id(entry.imdb)
+        else:
+            new_id = oldentry.imdb or ''
     else:
-        entry.imdb = clean_id
-    return entry
+        if is_valid_id(entry.imdb) and entry.imdb != '':
+            new_id = clean_imdb_id(entry.imdb)
+        else:
+            new_id = ask_imdb_interactive(entry.movie)
+
+    return new_id
+
+#
+#   When skipping IMDB (or IMDBpy missing)
+#   ======================================
+#
+#             | old ok   | old empty
+#   ----------+----------+----------
+#   new ok    | CHANGE   | CHANGE
+#   new empty | CHANGE   | CHANGE
+#   new inval | KEEP     | KEEP
+#
+#
+#   When going interactive
+#   ======================
+#
+#             | old ok   | old empty
+#   ----------+----------+----------
+#   new ok    | CHANGE   | CHANGE
+#   new empty | ASK      | ASK
+#   new inval | ASK      | ASK
+#

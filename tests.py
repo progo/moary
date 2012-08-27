@@ -20,8 +20,16 @@ import edit_entry, data
 import imdbutils
 
 # mock imdbutils here instead of ludibrio.
-imdbutils.ask_imdb_interactive = lambda x: '1234567'
-imdbutils.query_imdb_name = lambda x: 'Dummy Movie'
+def enable_imdbpy():
+    imdbutils.ask_imdb_interactive = lambda x: '1234567'
+    imdbutils.query_imdb_name = lambda x: 'Dummy Movie'
+    imdbutils.FORCE_SKIP = False
+def disable_imdbpy():
+    def throw_noimdbpy(x): raise imdbutils.NoIMDBpyException()
+    imdbutils.ask_imdb_interactive = throw_noimdbpy
+    imdbutils.query_imdb_name = throw_noimdbpy
+    imdbutils.FORCE_SKIP = True
+enable_imdbpy()
  
 class FileMockReadonly(BytesIO):
     """Mock temporaryfile that has a .name and something else.
@@ -551,13 +559,10 @@ class TestBatchAddWithoutIMDBpy(MoaryBatchTestCase):
     """Run batch tests with IMDBpy disabled."""
     def setUp(self):
         MoaryBatchTestCase.setUp(self)
-        def throw_noimdbpy(x): raise imdbutils.NoIMDBpyException()
-        imdbutils.ask_imdb_interactive = throw_noimdbpy
-        imdbutils.query_imdb_name = throw_noimdbpy
+        disable_imdbpy()
     def tearDown(self):
         MoaryBatchTestCase.tearDown(self)
-        imdbutils.ask_imdb_interactive = lambda x: '1234567'
-        imdbutils.query_imdb_name = lambda x: 'Dummy Movie'
+        enable_imdbpy()
 
     def testAddIMDBidonly(self):
         """try adding with IMDB id only. Shouldn't insert anything."""
@@ -594,13 +599,10 @@ class TestBatchAddWithoutIMDBpy_skipIMDB(MoaryBatchTestCase):
     """Run batch tests with IMDBpy disabled."""
     def setUp(self):
         MoaryBatchTestCase.setUp(self)
-        def throw_noimdbpy(x): raise imdbutils.NoIMDBpyException()
-        imdbutils.ask_imdb_interactive = throw_noimdbpy
-        imdbutils.query_imdb_name = throw_noimdbpy
+        disable_imdbpy()
     def tearDown(self):
         MoaryBatchTestCase.tearDown(self)
-        imdbutils.ask_imdb_interactive = lambda x: '1234567'
-        imdbutils.query_imdb_name = lambda x: 'Dummy Movie'
+        enable_imdbpy()
 
     def testAddIMDBidonly(self):
         """try adding with IMDB id only. Shouldn't insert anything."""
@@ -640,13 +642,10 @@ class TestIntAddsWithoutIMDBpy(MoaryAddTestCase):
 
     def setUp(self):
         MoaryAddTestCase.setUp(self)
-        def throw_noimdbpy(x): raise imdbutils.NoIMDBpyException()
-        imdbutils.ask_imdb_interactive = throw_noimdbpy
-        imdbutils.query_imdb_name = throw_noimdbpy
+        disable_imdbpy()
     def tearDown(self):
         MoaryAddTestCase.tearDown(self)
-        imdbutils.ask_imdb_interactive = lambda x: '1234567'
-        imdbutils.query_imdb_name = lambda x: 'Dummy Movie'
+        enable_imdbpy()
 
     def testFullAdd(self):
         """fill in full form."""
@@ -731,13 +730,10 @@ class TestIntEditsWithoutIMDBpy(MoaryEditTestCase):
 
     def setUp(self):
         MoaryEditTestCase.setUp(self)
-        def throw_noimdbpy(x): raise imdbutils.NoIMDBpyException()
-        imdbutils.ask_imdb_interactive = throw_noimdbpy
-        imdbutils.query_imdb_name = throw_noimdbpy
+        disable_imdbpy()
     def tearDown(self):
         MoaryEditTestCase.tearDown(self)
-        imdbutils.ask_imdb_interactive = lambda x: '1234567'
-        imdbutils.query_imdb_name = lambda x: 'Dummy Movie'
+        enable_imdbpy()
 
     def testGoodEdit(self):
         """good edit, modify everything a bit."""

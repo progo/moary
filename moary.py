@@ -20,17 +20,12 @@ def do_add(args):
     db = data.DataFacilities(dbfile=args.db_file)
     if args.movie:
         # 1. batch
-        try:
-            clean_id = imdbutils.clean_imdb_id(args.imdb)
-        except imdbutils.BadIMDBIdException:
-            print "Bad IMDB id '{0}', skipping...".format(args.imdb)
-            clean_id = ''
         newflick = Entry(unicode(args.movie),
                          args.rating,
-                         clean_id,
+                         args.imdb,
                          unicode(args.message or ""))
-        if not args.skip_imdb:
-            newflick = imdbutils.ensure_good_imdb_id_interactive(newflick)
+        newflick.imdb = imdbutils.just_work_dammit(newflick,
+                skip=args.skip_imdb)
     elif args.imdb:
         # 2. batch: No movie name given but something of an IMDB id
         if args.skip_imdb:
