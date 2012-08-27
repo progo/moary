@@ -268,8 +268,11 @@ class TestGoodAdd(MoaryAddTestCase):
         self.assertEquals(entry.imdb, '')
         self.assertEquals(entry.message, "Cool.")
  
+class TestBadAdd(MoaryAddTestCase):
+    """Some bad adds."""
+
     def testFaultyIMDBAdd_imdb(self):
-        """should query the id"""
+        """Give incorrect IMDB id. Should query it."""
         self.set_edited_content("""Movie: def
         Rating: 4
         IMDB: vccv
@@ -282,8 +285,6 @@ class TestGoodAdd(MoaryAddTestCase):
         self.assertEquals(entry.imdb, '1234567')
         self.assertEquals(entry.message, "Cool movie.")
 
-class TestBaddAdd(MoaryAddTestCase):
-    """Some bad adds."""
     def testFaultyIMDBAdd(self):
         """should clear the faulty id because no previous id provided."""
         self.set_edited_content("""Movie: def
@@ -544,8 +545,7 @@ class TestEditFromBadToBad(MoaryEditTestCase):
 
 ### Test stuff when IMDBpy is not present.
 
-## Batch stuff
-##############
+# Batch stuff
 
 class TestBatchAddWithoutIMDBpy(MoaryBatchTestCase):
     """Run batch tests with IMDBpy disabled."""
@@ -590,7 +590,6 @@ class TestBatchAddWithoutIMDBpy(MoaryBatchTestCase):
         self.assertEquals(entry.movie, u"XYZ")
         self.assertEquals(entry.imdb, '')
 
-# ugh how wet.
 class TestBatchAddWithoutIMDBpy_skipIMDB(MoaryBatchTestCase):
     """Run batch tests with IMDBpy disabled."""
     def setUp(self):
@@ -634,10 +633,11 @@ class TestBatchAddWithoutIMDBpy_skipIMDB(MoaryBatchTestCase):
         self.assertEquals(entry.movie, u"XYZ")
         self.assertEquals(entry.imdb, '')
 
-### Interactive adds without IMDBpy
-###################################
+# Interactive adds without IMDBpy
 
-class InteractiveTestCases_without_imdbpy(MoaryAddTestCase):
+class TestIntAddsWithoutIMDBpy(MoaryAddTestCase):
+    """Test a couple of good and bad adds. No IMDBpy."""
+
     def setUp(self):
         MoaryAddTestCase.setUp(self)
         def throw_noimdbpy(x): raise imdbutils.NoIMDBpyException()
@@ -648,7 +648,83 @@ class InteractiveTestCases_without_imdbpy(MoaryAddTestCase):
         imdbutils.ask_imdb_interactive = lambda x: '1234567'
         imdbutils.query_imdb_name = lambda x: 'Dummy Movie'
 
-### Interactive edits without IMDBpy
+    def testFullAdd(self):
+        """fill in full form."""
+        self.set_edited_content("""
+        Movie: ABC
+        Rating: 4
+        IMDB:  01234
+        ----- Review -----
+        Cool movie.
+        """)
+ 
+        entry = edit_entry.edit_data_interactive({})
+        self.assertEquals(entry.movie, "ABC")
+        self.assertEquals(entry.rating, '4')
+        self.assertEquals(entry.message, "Cool movie.")
+        self.assertEquals(entry.imdb, '0001234')
+
+    def testAddNoIMDB(self):
+        """don't give IMDB id. Should not ask about it."""
+        self.set_edited_content("""
+        Movie: ABC
+        Rating: 4
+        IMDB:
+        ----- Review -----
+        Cool movie.
+        """)
+
+        entry = edit_entry.edit_data_interactive({})
+        self.assertEquals(entry.movie, "ABC")
+        self.assertEquals(entry.rating, '4')
+        self.assertEquals(entry.message, "Cool movie.")
+        self.assertEquals(entry.imdb, '')
+
+    def testAddNoIMDB_skipIMDB(self):
+        """don't give IMDB id."""
+        self.set_edited_content("""
+        Movie: ABC
+        Rating: 4
+        IMDB:
+        ----- Review -----
+        Cool movie.
+        """)
+
+        entry = edit_entry.edit_data_interactive({}, skip_imdb=True)
+        self.assertEquals(entry.movie, "ABC")
+        self.assertEquals(entry.rating, '4')
+        self.assertEquals(entry.message, "Cool movie.")
+        self.assertEquals(entry.imdb, '')
+
+    def testFaultyIMDBAdd(self):
+        """Give incorrect IMDB id. Should clear it."""
+        self.set_edited_content("""Movie: def
+        Rating: 4
+        IMDB: vccv
+        ----- Review -----
+        Cool movie.
+        """)
+        entry = edit_entry.edit_data_interactive({})
+        self.assertEquals(entry.movie, "def")
+        self.assertEquals(entry.rating, '4')
+        self.assertEquals(entry.imdb, '')
+        self.assertEquals(entry.message, "Cool movie.")
+
+    def testFaultyIMDBAdd_noIMDB(self):
+        """Give incorrect IMDB id. Should clear it."""
+        self.set_edited_content("""Movie: def
+        Rating: 4
+        IMDB: vccv
+        ----- Review -----
+        Cool movie.
+        """)
+        entry = edit_entry.edit_data_interactive({}, skip_imdb=True)
+        self.assertEquals(entry.movie, "def")
+        self.assertEquals(entry.rating, '4')
+        self.assertEquals(entry.imdb, '')
+        self.assertEquals(entry.message, "Cool movie.")
+    
+# Interactive edits without IMDBpy
 
 
 if __name__ == '__main__':
