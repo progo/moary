@@ -19,17 +19,24 @@ def format_full(e):
     """print entry e in a nice, full form."""
     formatstring = ('-'*78 + '\n'+
                     '{movie}\n'+
-                    '{rating:<4} points       {imdburl}      ({longdate})\n'+
+                    '{rating:<4} points       {imdburl}      ({longdate})'+
                     '{message}')
     if not e.imdb:
         imdburl = ' '*36  # apprx length of a would-be IMDB url
     else:
         imdburl = imdbutils.imdb_url(e.imdb)
+
+    # skip empty line if there's no message.
+    if e.message:
+        message = '\n'+fill(e.message)
+    else:
+        message = ''
+
     return formatstring.format(movie=e.movie,
             rating=e.rating,
             imdburl=imdburl,
             longdate=e.origdate.strftime("%Y-%m-%d %H:%M"),
-            message=fill(e.message))
+            message=message)
 
 def format_csv(e):
     """print entry e in csv format."""

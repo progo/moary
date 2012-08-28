@@ -7,7 +7,6 @@
     - when sorting by ratings or movie names, we should merge watches of the
       same film. Avg the ratings.
 - Make moary look up the env variables for MOVIEDB. That'll be the unix way.
-- When no message present, don't print the empty line in full listings.
 - Force fillouts: run messages into long lines if not already and store it that
   way. (Split by '\n\n' into paragraphs and then map `replace('\n', ' ')`.)
   When printing, do split('\n\n') and map fill and println to each.
