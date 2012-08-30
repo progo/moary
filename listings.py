@@ -65,6 +65,9 @@ def do_list(args):
     if args.le: filters["rating <= ?"] = args.le
     if args.lt: filters["rating < ?"] = args.lt
 
+    if args.begin: filters["origdate >= ?"] = args.begin
+    if args.end: filters["origdate <= ?"] = args.end
+
     if args.sort_name: order = "movie"
     elif args.sort_rating: order = "rating"
     if args.asc:

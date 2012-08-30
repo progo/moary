@@ -4,6 +4,8 @@ import os
 import sys
 import argparse
 
+from datetime import datetime
+
 import edit_entry
 import imdbutils
 import listings
@@ -122,6 +124,20 @@ def _create_and_parse_args(argv):
             help='Show films with rating less or equal than')
     listparser.add_argument('--lt', type=float,
             help='Show films with rating less than')
+
+    def isodate(s):
+        """Try and parse ISO date into a datetime. Raise ArgumentTypeError for
+        argparse to handle in case of bad data."""
+        try:
+            return datetime.strptime(s, "%Y-%m-%d")
+        except ValueError:
+            raise argparse.ArgumentTypeError("Invalid date.")
+
+    listparser.add_argument('-b', '--begin', type=isodate,
+            help='Show entries stored after the date [YYYY-MM-DD] inclusive.')
+    listparser.add_argument('-e', '--end', type=isodate,
+            help='Show entries stored before the date [YYYY-MM-DD] exclusive.')
+
     listparser.add_argument('-S', '--sort-name', action='store_true',
             help='Sort results by name.')
     listparser.add_argument('-R', '--sort-rating', action='store_true',

@@ -2,7 +2,6 @@
     - And more probably something to my own blog (TextPattern with XML-RPC)
 - Listings
     - column selection for csv and compact?!
-    - date based filters
     - html report output
     - when sorting by ratings or movie names, we should merge watches of the
       same film. Avg the ratings.
