@@ -91,6 +91,8 @@ def _create_and_parse_args(argv):
             help="Don't query IMDB")
     psr.add_argument('-f', '--db-file', action='store',
             help='Specify a database other than default.')
+    psr.add_argument('-C', '--nocolor', action='store_true',
+            help="Disable color output.")
     psr.add_argument('-D', '--debug', action='store_true',
             help="Debug and dry-run.")
 

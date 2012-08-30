@@ -3,7 +3,6 @@
 - Listings
     - column selection for csv and compact?!
     - html report output
-    - color option
     - when sorting by ratings or movie names, we should merge watches of the
       same film. Avg the ratings.
 - Query IMDB to print a random bit of trivia about the movie after inserted.

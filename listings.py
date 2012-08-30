@@ -8,12 +8,20 @@ import data
 import imdbutils
 from entry import Entry
 
+COLORS = {"Movie": '\033[1;36m',
+          "END": '\033[0m'}
+NOCOLORS = dict((key, '') for key,_ in COLORS.items())
+Colors = COLORS
+
+def with_color(colname, string):
+    return Colors[colname] + string + Colors['END']
+
 def format_compact(e):
     """print entry e compactly in one line."""
     return '({date}) {rating:<4}    {movie}'.format(
             date=e.origdate.strftime("%Y-%m-%d"),
             rating=e.rating, 
-            movie=e.movie)
+            movie=with_color('Movie',e.movie))
 
 def format_full(e):
     """print entry e in a nice, full form."""
@@ -34,7 +42,7 @@ def format_full(e):
     else:
         message = ''
 
-    return formatstring.format(movie=e.movie,
+    return formatstring.format(movie=with_color('Movie',e.movie),
             rating=e.rating,
             imdburl=imdburl,
             longdate=e.origdate.strftime("%Y-%m-%d %H:%M"),
@@ -53,6 +61,9 @@ FORMATTERS = {'compact': format_compact,
 
 def do_list(args):
     """CLI func to call when doing subtask "list". """
+    
+    global Colors
+    Colors = NOCOLORS if args.nocolor else COLORS
     fmtfunc = FORMATTERS[args.format]
 
     filters = {}
