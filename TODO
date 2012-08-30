@@ -6,8 +6,5 @@
     - html report output
     - when sorting by ratings or movie names, we should merge watches of the
       same film. Avg the ratings.
-- Force fillouts: run messages into long lines if not already and store it that
-  way. (Split by '\n\n' into paragraphs and then map `replace('\n', ' ')`.)
-  When printing, do split('\n\n') and map fill and println to each.
 - Query IMDB to print a random bit of trivia about the movie after inserted.
   (Of course skip that if going batch or the IMDB has been given already.)

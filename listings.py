@@ -26,9 +26,11 @@ def format_full(e):
     else:
         imdburl = imdbutils.imdb_url(e.imdb)
 
-    # skip empty line if there's no message.
+    # massage messages to a nice form.
     if e.message:
-        message = '\n'+fill(e.message)
+        msglines = e.message.split('\n\n')
+        msglines = [fill(line) for line in msglines]
+        message = '\n' + '\n\n'.join(msglines)
     else:
         message = ''
 
