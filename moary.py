@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import os
 import sys
 import argparse
 
@@ -140,6 +141,10 @@ def _create_and_parse_args(argv):
 
     if len(argv) == 0: psr.parse_args(['-h'])
     args = psr.parse_args(argv)
+
+    # check for environ variables and set if no option given
+    if not args.db_file: args.db_file = os.environ.get('MOARY_MOVIEDB', '')
+
     return args
 
 def main(argv):
