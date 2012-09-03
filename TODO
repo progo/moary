@@ -5,5 +5,3 @@
     - html report output
     - when sorting by ratings or movie names, we should merge watches of the
       same film. Avg the ratings.
-- Query IMDB to print a random bit of trivia about the movie after inserted.
-  (Of course skip that if going batch or the IMDB has been given already.)

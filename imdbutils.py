@@ -1,6 +1,7 @@
 """IMDB related functions. """
 
 import re
+import random
 from entry import Entry
 
 FORCE_SKIP = False # Ignore IMDBpy in JWD. Never set this outside testing!
@@ -59,8 +60,9 @@ def ask_imdb_interactive(moviename):
         except ValueError:
             print "Sorry, not understood..."
 
-def query_imdb_name(imdb_id):
-    """Query IMDB for movie name. Will raise NoIMDBpyException if necessary."""
+def query_imdb_get_movie(imdb_id):
+    """Query IMDB for a movie record. Will raise NoIMDBpyException or
+    BadIMDBIdException if necessary. Return the movie entry."""
     try:
         import imdb
     except ImportError:
@@ -70,7 +72,27 @@ def query_imdb_name(imdb_id):
 
     ia = imdb.IMDb()
     movie = ia.get_movie(clean_id)
-    return movie["title"]
+    
+    # get extra info from the movie
+    ia.update(movie, info=['trivia'])
+
+    return movie
+
+def query_imdb_name(imdb_id):
+    return query_imdb_get_movie(imdb_id)['title']
+
+def query_random_trivia(imdb_id):
+    """get random trivia if any. Return as string."""
+    try:
+        movie = query_imdb_get_movie(imdb_id)
+    except:
+        return ''
+
+    trivia = movie.get('trivia')
+    if trivia:
+        return trivia[random.randrange(len(trivia))]
+    else:
+        return ''
 
 def is_valid_id(imdb_id):
     """Simple predicate to validate IMDB id."""

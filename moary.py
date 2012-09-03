@@ -50,6 +50,10 @@ def do_add(args):
         try:
             newflick = edit_entry.edit_data_interactive(None,
                     skip_imdb=args.skip_imdb)
+            if not args.skip_imdb:
+                from textwrap import fill
+                #triv = imdbutils.query_random_trivia(newflick.imdb)
+                #if triv: print 'TRIVIA:',fill(triv )
         except edit_entry.UserCancel:
             print "Empty name, exiting..."
             return 0
