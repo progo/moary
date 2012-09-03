@@ -15,17 +15,16 @@ CREATE = """CREATE TABLE IF NOT EXISTS movies
              updated timestamp);"""
 
 DBFILE = "movies.db"
-DATADIR = "."
 
 class EmptyDBException(): pass
 
 class DataFacilities():
     """Wrapped data interfaces in a class. (A closure would have done.)"""
 
-    def __establish_connection(self, datadir, dbfile):
-        dbfileloc = os.path.join(sys.path[0], datadir, dbfile)
-        if dbfile == ':memory:': dbfileloc = ':memory:'
-        con = sqlite3.connect(dbfileloc,
+    def __establish_connection(self, dbfile=None):
+        if not dbfile:
+            dbfile = os.path.join(sys.path[0], DBFILE)
+        con = sqlite3.connect(dbfile,
                 detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
         con.execute(CREATE)
         con.commit()
@@ -33,9 +32,7 @@ class DataFacilities():
 
     def __init__(self, datadir=None, dbfile=None):
         """Init sqlite3 connection. Use dbfile in datadir."""
-        datadir = datadir or DATADIR
-        dbfile = dbfile or DBFILE
-        self.con = self.__establish_connection(datadir, dbfile)
+        self.con = self.__establish_connection(dbfile)
 
     def store_entry(self, e):
         """push an Entry to the database."""
