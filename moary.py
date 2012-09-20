@@ -117,7 +117,7 @@ def _create_and_parse_args(argv):
             help='List entries')
     listparser.add_argument("format", nargs='?',
             help='Select the format style.',
-            choices=["compact", "csv", "full"])
+            choices=["compact", "csv", "full", "org"])
     listparser.add_argument('-t', '--title', action='store',
             help='Grep titles.')
     listparser.add_argument('-m', '--message', action='store',

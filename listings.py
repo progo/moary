@@ -55,8 +55,22 @@ def format_csv(e):
     writer.writerow((e.movie, e.rating, e.origdate, e.message))
     return output.getvalue().rstrip('\r\n ')
 
+def format_org(e):
+    """print entry e in an org-mode format."""
+    LEVEL = 1 # what headline levels the movies make?
+    result = [] # build the result string line-by-line
+    result.append("*"*LEVEL + " " + e.movie)
+    result.append(":PROPERTIES:")
+    result.append(":RATING: " + str(e.rating))
+    result.append(":IMDB: " + imdbutils.imdb_url(e.imdb))
+    result.append(":END:")
+    result.append(e.origdate.strftime("[%Y-%m-%d %a %H:%M]"))
+    result.append(e.message)
+    return '\n'.join(result)
+
 FORMATTERS = {'compact': format_compact,
               'full': format_full,
+              'org': format_org,
               'csv': format_csv}
 
 def do_list(args):
