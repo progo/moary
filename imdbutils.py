@@ -28,15 +28,14 @@ def clean_imdb_id(s):
     if s.isdigit(): return s.zfill(7)
     raise BadIMDBIdException()
 
-def ask_imdb_interactive(moviename):
+def ask_imdb_interactive(moviename, fetch_count=7):
     """run query to IMDB and ask user the movie id. Return the id."""
     try:
         import imdb
     except ImportError:
         raise NoIMDBpyException()
-    ia = imdb.IMDb()
-    ITEMS = 7
-    run = ia.search_movie(moviename, results=ITEMS)
+    ia = imdb.IMDb('http')
+    run = ia.search_movie(moviename, results=fetch_count)
     counter = 1
     ids = []
     for movie in run:
@@ -49,13 +48,16 @@ def ask_imdb_interactive(moviename):
     while True:
         try:
             user_input = raw_input(
-                "Which of these titles you had in mind? [0 to skip] ")
+                "Which of these titles you had in mind? [0 to skip, -1 to double list] ")
             if user_input == '': #default
                 number = 1
             else:
                 number = int(user_input)
-            if number == 0: return ""
-            if number < 0 or number > ITEMS: raise ValueError()
+            if number == 0:
+                return ""
+            if number == -1:
+                return ask_imdb_interactive(moviename, fetch_count*2)
+            if number < 0 or number > fetch_count: raise ValueError()
             return ids[number - 1]
         except ValueError:
             print "Sorry, not understood..."
