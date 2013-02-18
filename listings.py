@@ -2,6 +2,7 @@
 
 import StringIO
 import csv
+import math
 from textwrap import fill
 
 import data
@@ -19,16 +20,28 @@ Colors = COLORS
 def with_color(colname, string):
     return Colors[colname] + string + Colors['END']
 
-def build_graph(rating):
-    """Build a star seq from rating. Give some color when wanted."""
+def color_stars(stars, color, begin, end):
+    "color given stars (list) with color"
+    i = begin
+    while i <= end:
+        stars[i] = with_color(color, stars[i])
+        i += 1
 
-    def color_stars(stars, color, begin, end):
-        "color given stars (list) with color"
-        i = begin
-        while i <= end:
-            stars[i] = with_color(color, stars[i])
-            i += 1
+def exp_graph(rating, width=17):
+    """Exponential growing graph. Assumes ratings from 1-5."""
+    max_rat = math.log(5)
+    rating /= max_rat
+    rating = math.exp(rating)
+    stars = [' '] * width
+    stars[0:int(rating)] = '=' * int(rating)
+    color_stars(stars, "graph-bad", 0, 2)
+    color_stars(stars, "graph-decent", 3, 6)
+    color_stars(stars, "graph-good", 7, width-1)
+    return ''.join(stars)
 
+def linear_graph(rating, width=10):
+    """Build a star seq from rating. Give some color when wanted. Width not
+    used; fixed at 10."""
     ratint = int(rating*2 + 0.5)
     stars = [' '] * 10
     stars[0:ratint] = '=' * ratint
@@ -37,12 +50,15 @@ def build_graph(rating):
     color_stars(stars, "graph-good", 6, 9)
     return ''.join(stars)
 
+# What graphing shall be used by default?
+graph_func = linear_graph
+
 def format_compact(e):
     """print entry e compactly in one line."""
     return '({date}) {rating:<4} {graph}   {movie}'.format(
             date=e.origdate.strftime("%Y-%m-%d"),
             rating=e.rating, 
-            graph=build_graph(e.rating),
+            graph=graph_func(e.rating),
             movie=with_color('Movie',e.movie))
 
 def format_full(e):
@@ -101,6 +117,9 @@ def do_list(args):
     global Colors
     Colors = NOCOLORS if args.nocolor else COLORS
     fmtfunc = FORMATTERS[args.format]
+
+    global graph_func
+    graph_func = exp_graph if args.exp else linear_graph
 
     filters = {}
     order = ""
