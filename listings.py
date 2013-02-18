@@ -9,18 +9,33 @@ import imdbutils
 from entry import Entry
 
 COLORS = {"Movie": '\033[1;36m',
-          "END": '\033[0m'}
+        "graph-good": '\033[1;32m',
+        "graph-decent": '\033[1;34m',
+        "graph-bad": '\033[1;30m',
+        "END": '\033[0m'}
 NOCOLORS = dict((key, '') for key,_ in COLORS.items())
 Colors = COLORS
 
 def with_color(colname, string):
     return Colors[colname] + string + Colors['END']
 
-def build_graph(rating, width=10):
-    """Build a star seq from rating."""
+def build_graph(rating):
+    """Build a star seq from rating. Give some color when wanted."""
+
+    def color_stars(stars, color, begin, end):
+        "color given stars (list) with color"
+        i = begin
+        while i <= end:
+            stars[i] = with_color(color, stars[i])
+            i += 1
+
     ratint = int(rating*2 + 0.5)
-    ratstr = '*' * ratint
-    return ratstr.ljust(width)
+    stars = [' '] * 10
+    stars[0:ratint] = '=' * ratint
+    color_stars(stars, "graph-bad", 0, 2)
+    color_stars(stars, "graph-decent", 3, 5)
+    color_stars(stars, "graph-good", 6, 9)
+    return ''.join(stars)
 
 def format_compact(e):
     """print entry e compactly in one line."""
