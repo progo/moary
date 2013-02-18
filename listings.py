@@ -16,11 +16,18 @@ Colors = COLORS
 def with_color(colname, string):
     return Colors[colname] + string + Colors['END']
 
+def build_graph(rating, width=10):
+    """Build a star seq from rating."""
+    ratint = int(rating*2 + 0.5)
+    ratstr = '*' * ratint
+    return ratstr.ljust(width)
+
 def format_compact(e):
     """print entry e compactly in one line."""
-    return '({date}) {rating:<4}    {movie}'.format(
+    return '({date}) {rating:<4} {graph}   {movie}'.format(
             date=e.origdate.strftime("%Y-%m-%d"),
             rating=e.rating, 
+            graph=build_graph(e.rating),
             movie=with_color('Movie',e.movie))
 
 def format_full(e):
