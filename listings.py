@@ -27,7 +27,7 @@ def color_stars(stars, color, begin, end):
         stars[i] = with_color(color, stars[i])
         i += 1
 
-def exp_graph(rating, width=17):
+def exp_graph(rating, width=20):
     """Exponential growing graph. Assumes ratings from 1-5."""
     max_rat = math.log(5)
     rating /= max_rat
