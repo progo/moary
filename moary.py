@@ -9,6 +9,7 @@ from datetime import datetime
 import edit_entry
 import imdbutils
 import listings
+import stats
 import data
 
 from entry import Entry
@@ -162,6 +163,13 @@ def _create_and_parse_args(argv):
     editparser.add_argument("-d", "--delete", action="store_true",
             help='Delete last entry')
     editparser.set_defaults(func=do_edit)
+
+    # statistics
+    statparser = subparser.add_parser('stats',
+            help='See statistics.')
+    statparser.add_argument('-d', '--days', type=int,
+            help='Observe only last d days.')
+    statparser.set_defaults(func=stats.activity_calendar)
 
     if len(argv) == 0: psr.parse_args(['-h'])
     args = psr.parse_args(argv)

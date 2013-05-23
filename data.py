@@ -71,6 +71,12 @@ class DataFacilities():
         cur.execute("SELECT * FROM movies")
         return [Entry(*row) for row in cur.fetchall()]
 
+    def query(self, query, args):
+        """Run own query. """
+        cur = self.con.cursor()
+        cur.execute(query, args)
+        return cur.fetchall()
+
     def __get_last_rowid(self):
         """get the last rowid.""" 
         cur = self.con.cursor()
