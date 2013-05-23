@@ -94,6 +94,10 @@ def actcal_html(watched):
         '<head>',
         '<style> table { border: 0; }',
         'td { border-right: dashed thin black; padding: 2px; }',
+        'td.one { background-color: #BDFFB7; }',
+        'td.good { background-color: #80FF75; }',
+        'td.lots { background-color: #52CC48; }',
+        'td.heading { font-size: 4pt; }',
         '</style>',
         '</head>',
         '<body>'
@@ -103,15 +107,35 @@ def actcal_html(watched):
         dateint[0], dateint[-1]))
     result.append("<table>")
 
-    def make_row(items):
+    def silent_coercion(i):
+        """Coerce given object to integer. If not integer, throw
+        something negative."""
+        try:
+            return int(i)
+        except ValueError:
+            return -1
+
+    def make_row(items, force_class=None):
         res = ['<tr>']
         for i in items:
-            res.append('<td>{0}</td>'.format(i))
+            format_class = ''
+            if silent_coercion(i) > 2:
+                format_class = 'lots'
+            elif i == 2:
+                format_class = 'good'
+            elif i == 1:
+                format_class = 'one'
+
+            if force_class:
+                format_class = force_class
+
+            format_string = '<td class=\"' + format_class + '\">{0}</td>'
+            res.append(format_string.format(i))
         res.append('</tr>')
         return ''.join(res)
 
     monthline = [d.strftime("%b <br/> %d") for d in weekstarts]
-    result.append(make_row([''] + monthline))
+    result.append(make_row([''] + monthline, 'heading'))
     for weekday in range(0, 7):
         row = make_row([WEEKDAY_STR[weekday]] +
                        [watched[d]
