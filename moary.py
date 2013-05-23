@@ -169,6 +169,8 @@ def _create_and_parse_args(argv):
             help='See statistics.')
     statparser.add_argument('-d', '--days', type=int,
             help='Observe only last d days.')
+    statparser.add_argument('-H', '--html', action="store_true",
+            help='Output HTML')
     statparser.set_defaults(func=stats.activity_calendar)
 
     if len(argv) == 0: psr.parse_args(['-h'])
