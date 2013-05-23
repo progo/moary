@@ -86,7 +86,45 @@ def actcal_text(watched):
 
 def actcal_html(watched):
     """Format activity calendar in HTML."""
-    return "HTML"
+    dateint = get_date_interval(start_date=sorted(watched.keys())[0])
+    weekstarts = get_weekstarts(dateint)
+
+    result = [
+        '<html>',
+        '<head>',
+        '<style> table { border: 0; }',
+        'td { border-right: dashed thin black; padding: 2px; }',
+        '</style>',
+        '</head>',
+        '<body>'
+    ]
+
+    result.append("<h1>Films watched in {0}...{1}</h1>".format(
+        dateint[0], dateint[-1]))
+    result.append("<table>")
+
+    def make_row(items):
+        res = ['<tr>']
+        for i in items:
+            res.append('<td>{0}</td>'.format(i))
+        res.append('</tr>')
+        return ''.join(res)
+
+    monthline = [d.strftime("%b <br/> %d") for d in weekstarts]
+    result.append(make_row([''] + monthline))
+    for weekday in range(0, 7):
+        row = make_row([WEEKDAY_STR[weekday]] +
+                       [watched[d]
+                        for d in islice(dateint, weekday, None, 7)])
+        result.append(row)
+            
+    
+    result.append("</table>")
+    result.append("</body>")
+    result.append("</html>")
+
+    return '\n'.join(result)
+    
 
 FORMATTERS = {'text': actcal_text,
               'html': actcal_html}
