@@ -7,6 +7,8 @@ import datetime
 import data
 from entry import Entry
 
+WEEKDAY_STR = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+
 def activity_calendar(args, span=None):
     """Build a github-like activity calendar for the last `span` days."""
 
@@ -22,15 +24,9 @@ def activity_calendar(args, span=None):
                        , (day_modifier,))
 
     watcheddict = defaultdict(lambda: 0)
-    gh_array = {}
     for date, count in watched:
         d = date.date()
         watcheddict[d] = count
-
-        # keys are (week number, week day)
-        key = (d.isocalendar()[1], d.isoweekday())
-        gh_array[key] = {'count': count,
-                         'date': d}
 
     # round up to full weeks
     start_date = watched[0][0].date()
@@ -46,19 +42,15 @@ def activity_calendar(args, span=None):
         dateint.append(start_date)
         start_date += datetime.timedelta(days=1)
 
-    WEEKDAY_STR = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    # Collect beginning of each week in separate list
+    weekstarts = [d for d in islice(dateint, 0, None, 7)]
 
-    # check the months appearing in the date interval above
-    months = [d.strftime("%b") for d in islice(dateint, 0, None, 7)]
-
-    # and why not the start dates as well
-    weekstarts = [d.day for d in islice(dateint, 0, None, 7)]
-
+    monthline = ' '.join(d.strftime("%b") for d in weekstarts)
     print " " * 4 + "|",
-    print ' '.join(months)
+    print monthline
     print " " * 4 + "|",
-    print ' '.join('{0:<3}'.format(ws) for ws in weekstarts)
-    print '=' * (len(' '.join(months)) + 6)
+    print ' '.join('{0:<3}'.format(ws.day) for ws in weekstarts)
+    print '=' * (len(monthline) + 6)
 
     for weekday in range(0, 7):
         print '{0} |'.format(WEEKDAY_STR[weekday]),
