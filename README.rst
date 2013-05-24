@@ -68,6 +68,20 @@ Now it keeps quiet and no ID is set::
 
     moary.py -I add "Lost Highway"
 
+
+Statistics
+``````````
+
+Now get basic statistics from your viewing habits. Works best when you
+record the experience soon after the movie. Most will enjoy a HTML
+presentation::
+
+    moary.py stats -Ho
+
+Use your shell's functionality when you want to save the stats for
+later use.
+
+
 Philosophy
 ----------
 
