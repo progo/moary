@@ -2,6 +2,8 @@
 
 from itertools import islice, groupby
 from collections import defaultdict
+import tempfile
+import subprocess
 import datetime
 
 import data
@@ -32,7 +34,18 @@ def activity_calendar(args, formatter='text', span=None):
         d = date.date()
         watcheddict[d] = count
 
-    print FORMATTERS[formatter](watcheddict)
+    text = FORMATTERS[formatter](watcheddict)
+
+    if args.open:
+        with tempfile.NamedTemporaryFile(suffix='.html') as tf:
+            # At least Firefox in linux will not throw the page away
+            # even when the tempfile under it is removed quite
+            # immediately.
+            tf.write(text)
+            tf.flush()
+            subprocess.call(["xdg-open", tf.name])
+    else:
+        print text
 
 ### FORMATTERS
 ## Take the dict of {date: count} and return string outputs for
