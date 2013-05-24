@@ -97,8 +97,42 @@ def actcal_text(watched):
 
     return '\n'.join(result)
 
+
+def draw_view_graph(watched):
+    """Draw and return an SVG code snippet of views cumulating over time."""
+    try:
+        import pygal
+    except ImportError:
+        return "ERROR: pygal not installed"
+
+    chart = pygal.Line(width=600, height=400,
+                       disable_xml_declaration=True,
+                       style=pygal.style.LightStyle)
+
+    chart.title = 'Views over time'
+    chart.show_legend = False
+    chart.show_dots = False
+
+    wsorted = sorted(watched.keys())
+
+    cumsum = [(wsorted[0], watched[wsorted[0]])]
+    for key in wsorted[1:]:
+        lastval = cumsum[-1][1]
+        cumsum.append((key, lastval + watched[key]))
+
+    xlabels = [''] * len(cumsum)
+    for ind in range(0, len(cumsum), 7):
+        xlabels[ind] = cumsum[ind][0].strftime("%a %b %Y")
+
+    chart.x_labels = xlabels
+    chart.x_label_rotation = 45
+    chart.add('View count', [s[1] for s in cumsum])
+
+    return "<figure style='width: 800px;'>{0}</figure>".format(chart.render())
+
 def actcal_html(watched):
-    """Format activity calendar in HTML."""
+    """Format activity calendar in HTML. Also include a SVG graph of
+    views cumulating."""
     dateint = get_date_interval(start_date=sorted(watched.keys())[0])
     weekstarts = get_weekstarts(dateint)
 
@@ -157,6 +191,10 @@ def actcal_html(watched):
             
     
     result.append("</table>")
+
+    # result.append("<h1>Views over time</h1>")
+    result.append(draw_view_graph(watched))
+
     result.append("</body>")
     result.append("</html>")
 
