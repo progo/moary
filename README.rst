@@ -1,8 +1,8 @@
 Moary
 =====
 
-A work-in-progress effort to provide a local movie rating database or rather a
-diary for the CLI. The workflow with the usable product follows:
+An effort to provide a local movie rating database or rather a diary
+for the CLI environment. The workflow with the usable product follows:
 
 Workflow examples
 -----------------
