@@ -94,6 +94,7 @@ as much about reviewing as it is about a movie diary.
 Requirements
 ------------
 
-- IMDBpy version 4.9 (older versions have trouble with name search)
+- IMDBpy version 4.9 or 5.0dev: YMMV, I need 5.0 to get any results
+  from searches.
 - SQlite3 will be used.
 - A sensible ``$EDITOR`` set.
