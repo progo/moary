@@ -1,7 +1,4 @@
-- I might consider integrating a Tweet sending option to this.
-    - And more probably something to my own blog (TextPattern with XML-RPC)
 - Listings
-    - column selection for csv and compact?!
-    - html report output
-    - when sorting by ratings or movie names, we should merge watches of the
-      same film. Avg the ratings.
+  - html report output
+  - when sorting by ratings or movie names, we should merge watches of
+    the same film. Avg the ratings.
