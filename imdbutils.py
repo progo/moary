@@ -39,15 +39,15 @@ def ask_imdb_interactive(moviename, fetch_count=7):
     counter = 1
     ids = []
     for movie in run:
-        print "[" + str(counter) + "]   " + movie["long imdb title"]
+        print("[" + str(counter) + "]   " + movie["long imdb title"])
         ids.append(movie.movieID)
         counter += 1
     if counter == 1:
-        print "No movie matches."
+        print("No movie matches.")
         return ''
     while True:
         try:
-            user_input = raw_input(
+            user_input = input(
                 "Which of these titles you had in mind? [0 to skip, -1 to double list] ")
             if user_input == '': #default
                 number = 1
@@ -60,7 +60,7 @@ def ask_imdb_interactive(moviename, fetch_count=7):
             if number < 0 or number > fetch_count: raise ValueError()
             return ids[number - 1]
         except ValueError:
-            print "Sorry, not understood..."
+            print("Sorry, not understood...")
 
 def query_imdb_get_movie(imdb_id):
     """Query IMDB for a movie record. Will raise NoIMDBpyException or
@@ -74,7 +74,7 @@ def query_imdb_get_movie(imdb_id):
 
     ia = imdb.IMDb()
     movie = ia.get_movie(clean_id)
-    
+
     # get extra info from the movie
     ia.update(movie, info=['trivia'])
 

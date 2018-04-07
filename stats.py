@@ -45,7 +45,7 @@ def activity_calendar(args, formatter='text', span=None):
             tf.flush()
             subprocess.call(["xdg-open", tf.name])
     else:
-        print text
+        print(text)
 
 ### FORMATTERS
 ## Take the dict of {date: count} and return string outputs for

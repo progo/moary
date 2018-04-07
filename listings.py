@@ -1,6 +1,6 @@
 """Provide functions to list, filter and sort entries."""
 
-import StringIO
+from io import StringIO
 import csv
 import math
 from textwrap import fill
@@ -113,7 +113,7 @@ FORMATTERS = {'compact': format_compact,
 
 def do_list(args):
     """CLI func to call when doing subtask "list". """
-    
+
     global Colors
     Colors = NOCOLORS if args.nocolor else COLORS
     fmtfunc = FORMATTERS[args.format]
@@ -146,7 +146,7 @@ def do_list(args):
     db = data.DataFacilities(dbfile=args.db_file)
     try:
         for e in db.get_entries(filters, order):
-            print fmtfunc(e)
+            print(fmtfunc(e))
     except IOError:
         # can be caused by premature pipe closes (head etc)
         return

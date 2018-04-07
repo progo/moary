@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import os
 import sys
@@ -24,28 +24,28 @@ def do_add(args):
     db = data.DataFacilities(dbfile=args.db_file)
     if args.movie:
         # 1. batch
-        newflick = Entry(unicode(args.movie),
+        newflick = Entry(args.movie,
                          args.rating,
                          args.imdb,
-                         unicode(args.message or ""))
+                         args.message or "")
         newflick.imdb = imdbutils.just_work_dammit(newflick,
                 skip=args.skip_imdb)
     elif args.imdb:
         # 2. batch: No movie name given but something of an IMDB id
         if args.skip_imdb:
-            print "Can't do this without querying IMDB!"
+            print("Can't do this without querying IMDB!")
             return
         try:
             moviename = imdbutils.query_imdb_name(args.imdb)
             clean_id = imdbutils.clean_imdb_id(args.imdb)
         except imdbutils.BadIMDBIdException:
-            print "Malformed IMDB id, aborting."
+            print("Malformed IMDB id, aborting.")
             return
         except imdbutils.NoIMDBpyException:
-            print "Can't do this without querying IMDB! (No IMDBpy)"
+            print("Can't do this without querying IMDB! (No IMDBpy)")
             return
         newflick = Entry(moviename, imdb=clean_id, rating=args.rating,
-                message=unicode(args.message or ""))
+                         message=args.message or "")
     else:
         # 3. interactive
         try:
@@ -56,10 +56,10 @@ def do_add(args):
                 #triv = imdbutils.query_random_trivia(newflick.imdb)
                 #if triv: print 'TRIVIA:',fill(triv )
         except edit_entry.UserCancel:
-            print "Empty name, exiting..."
+            print("Empty name, exiting...")
             return 0
     if args.debug:
-        print newflick.__dict__
+        print(newflick.__dict__)
     else:
         db.store_entry(newflick)
 
@@ -70,12 +70,12 @@ def do_edit(args):
     try:
         lastentry = db.get_last()
     except data.EmptyDBException:
-        print "Nothing in the DB!"
+        print("Nothing in the DB!")
         return
 
     if args.delete:
         if args.debug:
-            print "Would delete:", vars(lastentry)
+            print("Would delete:", vars(lastentry))
             return
         else:
             db.delete_entry()
@@ -190,6 +190,6 @@ def main(argv):
 
 if __name__ == '__main__':
     """parse args and direct execution towards the right func."""
-    reload(sys)
-    sys.setdefaultencoding('utf-8') # wtf
+    # reload(sys)
+    # sys.setdefaultencoding('utf-8') # wtf
     main(sys.argv[1:])

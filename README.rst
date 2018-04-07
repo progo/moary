@@ -64,7 +64,7 @@ the IMDB title::
 
     moary.py add "Lost Highway"
 
-Now it keeps quiet and no ID is set::
+Now it keeps quiet and no ID is set or searched::
 
     moary.py -I add "Lost Highway"
 
@@ -94,7 +94,5 @@ as much about reviewing as it is about a movie diary.
 Requirements
 ------------
 
-- IMDBpy version 4.9 or 5.0dev: YMMV, I need 5.0 to get any results
-  from searches.
-- SQlite3 will be used.
+- If IMDB searches desired, IMDBpy version 6.5+ for latest support.
 - A sensible ``$EDITOR`` set.

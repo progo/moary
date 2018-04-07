@@ -28,24 +28,24 @@ def parse_string(string):
         """remove initial label from the beginning of the line"""
         return re.sub(r"\A.*?: ?", "", s.strip()).strip()
 
-    f = io.BytesIO(string.lstrip())
+    f = io.StringIO(string.lstrip())
     f.seek(0)
 
     # now just go through the file format
-    entry = Entry(movie=unicode(clean_line(f.readline())))
+    entry = Entry(movie=clean_line(f.readline()))
     entry.rating = clean_line(f.readline())
     entry.imdb = clean_line(f.readline())
     f.readline()
-    entry.message = unicode(f.read().strip())
+    entry.message = f.read().strip()
     return entry
 
 def fill_in_form(entry):
     """given movie dict, return filled-out form string for editors."""
     initial_message = (
-        "Movie: {0}\n" +
-        "Rating: {1}\n" +
-        "IMDB: {2}\n" +
-        "----- Review -----\n" +
+        "Movie: {0}\n"
+        "Rating: {1}\n"
+        "IMDB: {2}\n"
+        "----- Review -----\n"
         "{3}")
     if not entry:
         return initial_message.format('','','','\n')
@@ -66,7 +66,7 @@ def edit_data_interactive(olddata, skip_imdb=False):
     """given the Entry, invoke editor on user to edit the entry. Return the
     Entry with possibly updated info."""
 
-    with tempfile.NamedTemporaryFile() as tf:
+    with tempfile.NamedTemporaryFile(mode='w+') as tf:
         oldform = fill_in_form(olddata)
         newform = invoke_editor(oldform, tf)
         newdata = parse_string(newform)
