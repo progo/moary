@@ -53,15 +53,15 @@ def linear_graph(rating, width=10):
 # What graphing shall be used by default?
 graph_func = linear_graph
 
-def format_compact(e):
+def format_compact(e, args):
     """print entry e compactly in one line."""
-    return '({date}) {rating:<4} {graph}   {movie}'.format(
+    return args.list_format.format(
             date=e.origdate.strftime("%Y-%m-%d"),
-            rating=e.rating, 
+            rating=e.rating,
             graph=graph_func(e.rating),
             movie=with_color('Movie',e.movie))
 
-def format_full(e):
+def format_full(e, args):
     """print entry e in a nice, full form."""
     formatstring = ('-'*78 + '\n'+
                     '{movie}\n'+
@@ -86,14 +86,14 @@ def format_full(e):
             longdate=e.origdate.strftime("%Y-%m-%d %H:%M"),
             message=message)
 
-def format_csv(e):
+def format_csv(e, args):
     """print entry e in csv format."""
     output = StringIO.StringIO()
     writer = csv.writer(output)
     writer.writerow((e.movie, e.rating, e.origdate, e.message))
     return output.getvalue().rstrip('\r\n ')
 
-def format_org(e):
+def format_org(e, args):
     """print entry e in an org-mode format."""
     LEVEL = 1 # what headline levels the movies make?
     result = [] # build the result string line-by-line
@@ -133,6 +133,8 @@ def do_list(args):
 
     if args.begin: filters["origdate >= ?"] = args.begin
     if args.end: filters["origdate <= ?"] = args.end
+    if not args.list_format:
+        args.list_format = '({date}) {rating:<4} {graph}   {movie}'
 
     if args.sort_name: order = "movie"
     elif args.sort_rating: order = "rating"
@@ -146,7 +148,7 @@ def do_list(args):
     db = data.DataFacilities(dbfile=args.db_file)
     try:
         for e in db.get_entries(filters, order):
-            print(fmtfunc(e))
+            print(fmtfunc(e, args))
     except IOError:
         # can be caused by premature pipe closes (head etc)
         return

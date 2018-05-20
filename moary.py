@@ -155,6 +155,8 @@ def _create_and_parse_args(argv):
             help='Sort ascending')
     listparser.add_argument('-D', '--desc', action='store_true',
             help='Sort descending')
+    listparser.add_argument('-F', '--list-format', action='store',
+            help='Format used for compact listings')
     listparser.set_defaults(format='compact', func=listings.do_list)
 
     # edit section will be limited to the last one for the time being.

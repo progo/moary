@@ -69,6 +69,14 @@ Now it keeps quiet and no ID is set or searched::
     moary.py -I add "Lost Highway"
 
 
+List format
+```````````
+
+Compact listing (the default) supports a user-provided format strings
+now. (The `-F` or `--list-format` option.) The strings follow Python's
+string format syntax. The supported symbols are currently: movie,
+rating, graph, date.
+
 Statistics
 ``````````
 
