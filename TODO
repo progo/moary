@@ -1,4 +1,0 @@
-- Listings
-  - html report output
-  - when sorting by ratings or movie names, we should merge watches of
-    the same film. Avg the ratings.
