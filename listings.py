@@ -53,38 +53,49 @@ def linear_graph(rating, width=10):
 # What graphing shall be used by default?
 graph_func = linear_graph
 
+def entry_with_data(e):
+    """Provide an entry `e' with extra data. Return a dict ready to be
+    used in a format string.
+    """
+
+    title = with_color('Movie',e.movie)
+
+    if not e.imdb:
+        imdburl = ' '*36  # apprx length of a would-be IMDB url
+    else:
+        imdburl = imdbutils.imdb_url(e.imdb)
+
+    # TODO: making this pretty message doubles the time to make a listing.
+    if e.message:
+        msglines = e.message.split('\n\n')
+        msglines = [fill(line) for line in msglines]
+        pretty_message = '\n' + '\n\n'.join(msglines)
+    else:
+        pretty_message = ''
+
+    return {
+        'date': e.origdate.strftime("%Y-%m-%d"),
+        'longdate': e.origdate.strftime("%Y-%m-%d %H:%M"),
+        'rating': e.rating,
+        'message': e.message,
+        'message_formatted': pretty_message,
+        'graph': graph_func(e.rating),
+        'movie': title,
+        'title': title,
+        'imdburl': imdburl
+    }
+
 def format_compact(e, args):
     """print entry e compactly in one line."""
-    return args.list_format.format(
-            date=e.origdate.strftime("%Y-%m-%d"),
-            rating=e.rating,
-            graph=graph_func(e.rating),
-            movie=with_color('Movie',e.movie))
+    return args.list_format.format(**entry_with_data(e))
 
 def format_full(e, args):
     """print entry e in a nice, full form."""
     formatstring = ('-'*78 + '\n'+
                     '{movie}\n'+
                     '{rating:<4} points       {imdburl}      ({longdate})'+
-                    '{message}')
-    if not e.imdb:
-        imdburl = ' '*36  # apprx length of a would-be IMDB url
-    else:
-        imdburl = imdbutils.imdb_url(e.imdb)
-
-    # massage messages to a nice form.
-    if e.message:
-        msglines = e.message.split('\n\n')
-        msglines = [fill(line) for line in msglines]
-        message = '\n' + '\n\n'.join(msglines)
-    else:
-        message = ''
-
-    return formatstring.format(movie=with_color('Movie',e.movie),
-            rating=e.rating,
-            imdburl=imdburl,
-            longdate=e.origdate.strftime("%Y-%m-%d %H:%M"),
-            message=message)
+                    '{message_formatted}')
+    return formatstring.format(**entry_with_data(e))
 
 def format_csv(e, args):
     """print entry e in csv format."""

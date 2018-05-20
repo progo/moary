@@ -74,8 +74,10 @@ List format
 
 Compact listing (the default) supports a user-provided format strings
 now. (The `-F` or `--list-format` option.) The strings follow Python's
-string format syntax. The supported symbols are currently: movie,
-rating, graph, date.
+string format syntax.
+
+The supported symbols are: movie, rating, graph, date, longdate,
+message, message_formatted, imdburl.
 
 Statistics
 ``````````
