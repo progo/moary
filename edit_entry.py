@@ -74,8 +74,16 @@ def edit_data_interactive(olddata, skip_imdb=False):
         if not newdata.movie:
             raise UserCancel()
 
-        newdata.imdb = imdbutils.just_work_dammit(newdata, olddata,
-                skip=skip_imdb)
+        try:
+            newdata.imdb = imdbutils.just_work_dammit(newdata, olddata,
+                                                      skip=skip_imdb)
+        except Exception as e:
+            # Yes, again the old dilemma: should we keep existing
+            # value or clear it? I say, clear it, because the user
+            # will be notified of the problem and he can try again
+            # soon.
+            print("IMDB couldn't be reached!", e)
+            newdata.imdb = ''
 
         if olddata and olddata.rating and not is_valid_rating(newdata.rating):
             newdata.rating = olddata.rating
