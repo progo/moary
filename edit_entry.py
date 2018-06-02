@@ -12,9 +12,7 @@ import imdbutils
 
 from entry import Entry
 
-class UserCancel():
-    """Exception when user decides to cancel the interactive scenes."""
-    pass
+class UserCancel(): "Exception when user decides to cancel the interactive scenes."
 
 def is_valid_rating(rating):
     """Predicate to check if the rating is valid."""
