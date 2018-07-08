@@ -4,6 +4,7 @@ from io import StringIO
 import csv
 import math
 from textwrap import fill
+from collections import namedtuple
 
 import data
 import imdbutils
@@ -16,6 +17,12 @@ COLORS = {"Movie": '\033[1;36m',
         "END": '\033[0m'}
 NOCOLORS = dict((key, '') for key,_ in COLORS.items())
 Colors = COLORS
+
+LIST_FORMAT_VARS = ['date', 'longdate', 'rating', 'message',
+                    'message_formatted', 'graph', 'movie', 'title', 'imdburl']
+
+EntryData = namedtuple('EntryData', LIST_FORMAT_VARS)
+
 
 def with_color(colname, string):
     return Colors[colname] + string + Colors['END']
@@ -73,21 +80,20 @@ def entry_with_data(e):
     else:
         pretty_message = ''
 
-    return {
-        'date': e.origdate.strftime("%Y-%m-%d"),
-        'longdate': e.origdate.strftime("%Y-%m-%d %H:%M"),
-        'rating': e.rating,
-        'message': e.message,
-        'message_formatted': pretty_message,
-        'graph': graph_func(e.rating),
-        'movie': title,
-        'title': title,
-        'imdburl': imdburl
-    }
+    return EntryData(
+        date=e.origdate.strftime("%Y-%m-%d"),
+        longdate=e.origdate.strftime("%Y-%m-%d %H:%M"),
+        rating=e.rating,
+        message=e.message,
+        message_formatted=pretty_message,
+        graph=graph_func(e.rating),
+        movie=title,
+        title=title,
+        imdburl=imdburl)
 
 def format_compact(e, args):
     """print entry e compactly in one line."""
-    return args.list_format.format(**entry_with_data(e))
+    return args.list_format.format(**entry_with_data(e)._asdict())
 
 def format_full(e, args):
     """print entry e in a nice, full form."""
@@ -95,7 +101,7 @@ def format_full(e, args):
                     '{movie}\n'+
                     '{rating:<4} points       {imdburl}      ({longdate})'+
                     '{message_formatted}')
-    return formatstring.format(**entry_with_data(e))
+    return formatstring.format(**entry_with_data(e)._asdict())
 
 def format_csv(e, args):
     """print entry e in csv format."""

@@ -156,7 +156,9 @@ def _create_and_parse_args(argv):
     listparser.add_argument('-D', '--desc', action='store_true',
             help='Sort descending')
     listparser.add_argument('-F', '--list-format', action='store',
-            help='Format used for compact listings')
+            help='Format used for compact listings. Supported variables are: '
+                            + ', '.join(['{' + a + '}'
+                                         for a in listings.LIST_FORMAT_VARS]))
     listparser.set_defaults(format='compact', func=listings.do_list)
 
     # edit section will be limited to the last one for the time being.
